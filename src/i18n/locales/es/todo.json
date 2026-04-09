@@ -1,0 +1,32 @@
+{
+  "form": {
+    "titleLabel": "Título",
+    "descriptionLabel": "Descripción",
+    "titlePlaceholder": "¿Qué necesitas hacer?",
+    "descriptionPlaceholder": "Descripción (opcional)",
+    "save": "Guardar",
+    "add": "Añadir",
+    "cancel": "Cancelar"
+  },
+  "filters": {
+    "all": "Todos",
+    "active": "Activos",
+    "completed": "Completados",
+    "clearCompleted": "Limpiar completados"
+  },
+  "list": {
+    "emptyTitle": "No hay tareas todavía",
+    "emptyDescription": "Añade una nueva tarea usando el formulario de arriba"
+  },
+  "item": {
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "confirmTitle": "Eliminar tarea",
+    "confirmMessage": "¿Estás seguro de que quieres eliminar \"{{title}}\"?",
+    "confirmWarning": "Esta acción no se puede deshacer.",
+    "markPending": "pendiente",
+    "markCompleted": "completada",
+    "checkboxLabel": "Marcar \"{{title}}\" como {{status}}",
+    "editTitle": "Editar tarea"
+  }
+}

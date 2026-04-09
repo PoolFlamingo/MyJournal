@@ -1,0 +1,19 @@
+{
+  "title": "Tauract",
+  "subtitle": "Task manager",
+  "footer": "Tauri + React + Bun + SQLite",
+  "theme": {
+    "change": "Change theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "label": "Language",
+    "es": "Español",
+    "en": "English"
+  },
+  "errors": {
+    "loadFailed": "Failed to load tasks"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "form": {
+    "titleLabel": "Title",
+    "descriptionLabel": "Description",
+    "titlePlaceholder": "What do you need to do?",
+    "descriptionPlaceholder": "Description (optional)",
+    "save": "Save",
+    "add": "Add",
+    "cancel": "Cancel"
+  },
+  "filters": {
+    "all": "All",
+    "active": "Active",
+    "completed": "Completed",
+    "clearCompleted": "Clear completed"
+  },
+  "list": {
+    "emptyTitle": "No tasks yet",
+    "emptyDescription": "Add a new task using the form above"
+  },
+  "item": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmTitle": "Delete task",
+    "confirmMessage": "Are you sure you want to delete \"{{title}}\"?",
+    "confirmWarning": "This action cannot be undone.",
+    "markPending": "pending",
+    "markCompleted": "completed",
+    "checkboxLabel": "Mark \"{{title}}\" as {{status}}",
+    "editTitle": "Edit task"
+  }
+}

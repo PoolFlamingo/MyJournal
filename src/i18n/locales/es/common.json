@@ -1,0 +1,19 @@
+{
+  "title": "Tauract",
+  "subtitle": "Gestor de tareas",
+  "footer": "Tauri + React + Bun + SQLite",
+  "theme": {
+    "change": "Cambiar tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+  "language": {
+    "label": "Idioma",
+    "es": "Español",
+    "en": "English"
+  },
+  "errors": {
+    "loadFailed": "Error al cargar las tareas"
+  }
+}
