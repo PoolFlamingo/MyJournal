@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Pencil, Trash2 } from "lucide-react";
 import type { Todo, UpdateTodoDto } from "@/types/todo";
 import { cn } from "@/lib/utils";
@@ -32,6 +33,7 @@ interface TodoItemProps {
 export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { t } = useTranslation("todo");
 
   function handleEdit(data: UpdateTodoDto | { title: string }) {
     onEdit({ ...data, id: todo.id } as UpdateTodoDto);
@@ -55,7 +57,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
           checked={todo.completed}
           onCheckedChange={() => onToggle(todo.id)}
           className="mt-0.5"
-          aria-label={`Marcar "${todo.title}" como ${todo.completed ? "pendiente" : "completada"}`}
+          aria-label={t("item.checkboxLabel", { title: todo.title, status: t(todo.completed ? "item.markPending" : "item.markCompleted") })}
         />
 
         <div className="flex-1 min-w-0">
@@ -80,7 +82,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
             size="icon"
             className="h-7 w-7"
             onClick={() => setIsEditing(true)}
-            aria-label="Editar"
+            aria-label={t("item.edit")}
           >
             <Pencil className="h-3.5 w-3.5" />
           </Button>
@@ -89,7 +91,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
             size="icon"
             className="h-7 w-7 text-destructive hover:text-destructive"
             onClick={() => setIsDeleting(true)}
-            aria-label="Eliminar"
+            aria-label={t("item.delete")}
           >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
@@ -100,7 +102,7 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Editar tarea</DialogTitle>
+            <DialogTitle>{t("item.editTitle")}</DialogTitle>
           </DialogHeader>
           <TodoForm
             editingTodo={todo}
@@ -114,19 +116,19 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemProps) {
       <AlertDialog open={isDeleting} onOpenChange={setIsDeleting}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Eliminar tarea</AlertDialogTitle>
+            <AlertDialogTitle>{t("item.confirmTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              ¿Estás seguro de que quieres eliminar &quot;{todo.title}&quot;?
-              Esta acción no se puede deshacer.
+              {t("item.confirmMessage", { title: todo.title })}{" "}
+              {t("item.confirmWarning")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t("form.cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Eliminar
+              {t("item.delete")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,7 +1,9 @@
+import { useTranslation } from "react-i18next";
 import { useTodos } from "@/hooks/useTodos";
 import { TodoForm } from "@/components/todo/TodoForm";
 import { TodoFilters } from "@/components/todo/TodoFilters";
 import { TodoList } from "@/components/todo/TodoList";
+import { LanguageSwitch } from "@/components/language-switch";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -64,23 +66,26 @@ function App() {
 		}
 	}
 
+	const { t } = useTranslation("common");
+
 	return (
 		<main className="min-h-screen bg-background">
 			<div className="mx-auto max-w-2xl px-4 py-8">
-				<header className="flex items-center justify-between mb-8">
+				<header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
 					<div>
-						<h1 className="text-3xl font-bold tracking-tight">Tauract</h1>
-						<p className="text-sm text-muted-foreground">
-							Gestor de tareas
-						</p>
+						<h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+						<p className="text-sm text-muted-foreground">{t("subtitle")}</p>
 					</div>
-					<ThemeToggle />
+					<div className="flex items-center gap-2">
+						<LanguageSwitch />
+						<ThemeToggle />
+					</div>
 				</header>
 
 				{error && (
 					<Alert variant="destructive" className="mb-6">
 						<AlertCircle className="h-4 w-4" />
-						<AlertDescription>{error}</AlertDescription>
+						<AlertDescription>{t("errors.loadFailed")}</AlertDescription>
 					</Alert>
 				)}
 
@@ -107,9 +112,7 @@ function App() {
 				</Card>
 
 				<footer className="mt-8 text-center">
-					<p className="text-xs text-muted-foreground">
-						Tauri + React + Bun + SQLite
-					</p>
+					<p className="text-xs text-muted-foreground">{t("footer")}</p>
 				</footer>
 			</div>
 		</main>

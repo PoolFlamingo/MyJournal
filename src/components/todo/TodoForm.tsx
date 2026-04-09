@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from "react";
+import { useState, type SyntheticEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -19,8 +20,9 @@ export function TodoForm({ editingTodo, onSubmit, onCancel }: TodoFormProps) {
   );
 
   const isEditing = !!editingTodo;
+  const { t } = useTranslation("todo");
 
-  function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: SyntheticEvent) {
     e.preventDefault();
     const trimmedTitle = title.trim();
     if (!trimmedTitle) return;
@@ -46,11 +48,11 @@ export function TodoForm({ editingTodo, onSubmit, onCancel }: TodoFormProps) {
       <div className="space-y-3">
         <div className="space-y-1.5">
           <Label htmlFor="todo-title" className="sr-only">
-            Título
+            {t("form.titleLabel")}
           </Label>
           <Input
             id="todo-title"
-            placeholder="¿Qué necesitas hacer?"
+            placeholder={t("form.titlePlaceholder")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             autoFocus
@@ -58,11 +60,11 @@ export function TodoForm({ editingTodo, onSubmit, onCancel }: TodoFormProps) {
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="todo-description" className="sr-only">
-            Descripción
+            {t("form.descriptionLabel")}
           </Label>
           <Textarea
             id="todo-description"
-            placeholder="Descripción (opcional)"
+            placeholder={t("form.descriptionPlaceholder")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={2}
@@ -72,11 +74,11 @@ export function TodoForm({ editingTodo, onSubmit, onCancel }: TodoFormProps) {
       </div>
       <div className="flex items-center gap-2">
         <Button type="submit" disabled={!title.trim()}>
-          {isEditing ? "Guardar" : "Añadir"}
+          {isEditing ? t("form.save") : t("form.add")}
         </Button>
         {onCancel && (
           <Button type="button" variant="secondary" onClick={onCancel}>
-            Cancelar
+            {t("form.cancel")}
           </Button>
         )}
       </div>

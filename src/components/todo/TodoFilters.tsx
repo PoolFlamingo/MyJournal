@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { TodoFilter } from "@/types/todo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,10 +17,11 @@ export function TodoFilters({
   onFilterChange,
   onClearCompleted,
 }: TodoFiltersProps) {
+  const { t } = useTranslation("todo");
   const filters: { key: TodoFilter; label: string; count: number }[] = [
-    { key: "all", label: "Todos", count: counts.all },
-    { key: "active", label: "Activos", count: counts.active },
-    { key: "completed", label: "Completados", count: counts.completed },
+    { key: "all", label: t("filters.all"), count: counts.all },
+    { key: "active", label: t("filters.active"), count: counts.active },
+    { key: "completed", label: t("filters.completed"), count: counts.completed },
   ];
 
   return (
@@ -44,7 +46,7 @@ export function TodoFilters({
       </Tabs>
       {counts.completed > 0 && (
         <Button variant="ghost" size="sm" onClick={onClearCompleted}>
-          Limpiar completados
+          {t("filters.clearCompleted")}
         </Button>
       )}
     </div>
