@@ -64,7 +64,7 @@ class SidecarService {
 		}
 
 		const dataDir = await appDataDir();
-		const dbPath = `${dataDir}todos.db`;
+		const dbPath = `${dataDir}my-journal.db`;
 
 		const readyPromise = new Promise<void>((resolve) => {
 			this.readyResolve = resolve;

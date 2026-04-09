@@ -1,0 +1,73 @@
+{
+	"welcome": {
+		"title": "Welcome to My Journal",
+		"subtitle": "Your personal space to reflect, create, and remember.",
+		"createNew": "Create new journal",
+		"openExisting": "Open existing journal",
+		"importJournal": "Import journal",
+		"noJournals": "You don't have any journals yet. Create one to get started."
+	},
+	"sidebar": {
+		"journals": "Journals",
+		"calendar": "Calendar",
+		"newJournal": "New journal",
+		"settings": "Settings"
+	},
+	"journal": {
+		"name": "Journal name",
+		"namePlaceholder": "My personal journal",
+		"description": "Description",
+		"descriptionPlaceholder": "A brief description of your journal...",
+		"privacy": "Privacy",
+		"public": "Public",
+		"private": "Private",
+		"password": "Password",
+		"passwordPlaceholder": "Enter a secure password",
+		"confirmPassword": "Confirm password",
+		"create": "Create journal",
+		"rename": "Rename",
+		"delete": "Delete journal",
+		"deleteConfirm": "Are you sure you want to delete this journal? This action cannot be undone.",
+		"locked": "Locked",
+		"unlock": "Unlock",
+		"lock": "Lock",
+		"open": "Open",
+		"entries_one": "{{count}} entry",
+		"entries_other": "{{count}} entries",
+		"noEntries": "No entries"
+	},
+	"unlock": {
+		"title": "Private journal",
+		"message": "This journal is password-protected.",
+		"passwordLabel": "Password",
+		"passwordPlaceholder": "Enter password",
+		"submit": "Unlock",
+		"invalidPassword": "Incorrect password",
+		"noRecovery": "If you forgot your password, it is not possible to recover the content."
+	},
+	"entry": {
+		"title": "Entry title",
+		"titlePlaceholder": "What do you want to write today?",
+		"save": "Save",
+		"saving": "Saving...",
+		"saved": "Saved",
+		"unsavedChanges": "You have unsaved changes. Do you want to discard them?",
+		"delete": "Delete entry",
+		"deleteConfirm": "Are you sure you want to delete this entry?",
+		"noEntry": "There is no entry for this day.",
+		"createEntry": "Create entry",
+		"editorPlaceholder": "Start writing..."
+	},
+	"calendar": {
+		"today": "Today",
+		"noEntries": "No entries this month"
+	},
+	"errors": {
+		"loadFailed": "Failed to load journals",
+		"createFailed": "Failed to create journal",
+		"saveFailed": "Failed to save entry",
+		"deleteFailed": "Failed to delete",
+		"unlockFailed": "Failed to unlock journal",
+		"journalLocked": "This journal is locked"
+	}
+}

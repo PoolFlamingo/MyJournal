@@ -1,60 +1,72 @@
-# Copilot Instructions — Tauract
+# Copilot Instructions — My Journal
 
 ## Project Overview
 
-Tauract is a Tauri v2 + React 19 + TypeScript desktop app template. It serves as a starter for building desktop applications with a TODO list example backed by SQLite (planned). The project language context is Spanish (see `APP_BASE_PLAN.md`).
+My Journal is a Tauri v2 desktop application for personal journaling. The repository started from the Tauract template, but the current product direction is no longer a generic TODO app.
+
+The codebase already includes the foundations that future work should build on:
+
+- React 19 + TypeScript frontend
+- Bun sidecar for SQLite access and domain workflows
+- Tauri v2 Rust host for native shell integrations
+- i18n support for Spanish and English
+- Theme presets stored as JSON tokens
+
+The existing TODO flow is scaffolding. Unless a prompt is explicitly about the TODO example, new features should align with the journal roadmap in `MY_JOURNAL_ROADMAP.md`.
 
 ## Architecture
 
 ```
-src/            ← React frontend (Vite dev server on port 1420)
-src-tauri/      ← Rust backend (Tauri v2)
-  src/lib.rs    ← Tauri commands + app builder (entry: run())
-  src/main.rs   ← Binary entry point, calls tauract_lib::run()
+src/            ← React frontend, hooks, providers, services, i18n, UI
+sidecar/        ← Bun sidecar, Drizzle schema, migrations, IPC handlers
+src-tauri/      ← Rust host, plugins, shell integration, window lifecycle
 ```
 
-- **Frontend→Backend communication**: Use `invoke()` from `@tauri-apps/api/core` to call Rust commands. Command arguments are passed as an object: `invoke("greet", { name })`.
-- **Rust commands**: Annotate with `#[tauri::command]` in `src-tauri/src/lib.rs` and register in `.invoke_handler(tauri::generate_handler![...])`.
-- **Capabilities/permissions**: Defined in `src-tauri/capabilities/default.json`. Add new plugin permissions there when integrating Tauri plugins.
+- **Persistence and domain logic**: Prefer the sidecar for SQLite access, file indexing, import/export flows, and journal business logic.
+- **Frontend boundaries**: Components should go through hooks and `src/services/`, not raw IPC or SQLite details.
+- **Rust boundaries**: Keep Rust focused on Tauri host concerns, plugin wiring, and native capabilities that do not belong in the sidecar.
+- **Cross-layer changes**: When adding a new domain feature, update IPC methods, DTOs, service wrappers, and UI contracts together.
+
+## Product Direction
+
+The roadmap describes a journal-first application with:
+
+- multiple journals, with one active journal at a time
+- calendar-based navigation in the left sidebar
+- a rich-text editor for entries
+- journal privacy settings, including private journals
+- entry content stored as `.myj` or text-based files, with SQLite used as an index/metadata layer
+- import/export and integrity validation
+
+If current scaffold code and roadmap differ, preserve working behavior but steer new implementations toward the journal model instead of expanding the TODO example by inertia.
 
 ## Key Commands
 
 | Action | Command |
 |---|---|
-| Dev (frontend only) | `npm run dev` |
-| Dev (full Tauri app) | `npm run tauri dev` |
-| Build production | `npm run tauri build` |
-| Type-check frontend | `tsc` |
-
-Tauri orchestrates both frontend and backend: `tauri dev` runs `npm run dev` automatically (configured in `src-tauri/tauri.conf.json` → `build.beforeDevCommand`).
+| Frontend dev server | `npm run dev` |
+| Full desktop dev flow | `npm run tauri:dev` |
+| Build sidecar binary | `npm run build:sidecar` |
+| Generate migrations | `npm run build:migrations` |
+| Type-check frontend | `npx tsc --noEmit` |
+| Lint frontend | `npm run lint` |
+| Check formatting | `npm run format:check` |
+| Production build | `npm run tauri build` |
 
 ## Conventions
 
-- **Frontend**: Functional React components with hooks (`useState`, etc.). No class components. JSX uses `.tsx` extension.
-- **Styling**: Plain CSS in `src/App.css` — no CSS framework currently. Dark mode supported via `prefers-color-scheme` media query.
-- **Assets**: Images go in `src/assets/media/imgs/`; reusable components in `src/assets/components/`.
-- **Rust lib naming**: The library crate is named `tauract_lib` (with `_lib` suffix) to avoid Windows build conflicts between lib and bin targets. Do not rename it.
-- **TypeScript**: Strict mode enabled (`strict: true`, `noUnusedLocals`, `noUnusedParameters`). Target ES2020, module ESNext with bundler resolution.
+- Follow `.editorconfig`: the project uses tabs, with width 2 for `tsx`, `json`, `css`, and `html`.
+- Use functional React components and hooks. Do not introduce class components.
+- Prefer the `@/` alias inside `src/` when practical.
+- Put user-facing text in i18n resources. When adding UI copy, update both Spanish and English locales.
+- Keep theme work aligned with `src/assets/themes/*.json` and the existing token format.
+- Maintain strict TypeScript compatibility and avoid unused symbols.
+- The Rust library crate name `tauract_lib` must remain unchanged.
+- **Never remove `"ignoreDeprecations": "6.0"` from `tsconfig.json`.** This option is intentional and required for compatibility. Do not treat it as an error or dead config.
 
-## Adding a New Tauri Command
+## Implementation Guidance
 
-1. Define the function in `src-tauri/src/lib.rs` with `#[tauri::command]`:
-   ```rust
-   #[tauri::command]
-   fn my_command(arg: String) -> Result<String, String> { ... }
-   ```
-2. Register it: `.invoke_handler(tauri::generate_handler![greet, my_command])`
-3. Call from React: `const result = await invoke("my_command", { arg: "value" });`
-
-## Planned Features (see APP_BASE_PLAN.md)
-
-- **SQLite integration**: TODO CRUD backed by SQLite. May be implemented via Node sidecar (Deno-compiled TypeScript) or Rust-side ORM. Check `APP_BASE_PLAN.md` for the latest decision.
-- **TODO list UI**: React components for create/read/update/delete operations.
-
-## Dependencies
-
-- **Frontend**: React 19, `@tauri-apps/api` v2, `@tauri-apps/plugin-opener` v2, Vite 7
-- **Backend**: Tauri 2, `tauri-plugin-opener`, `serde`/`serde_json` for serialization
-
-## Extra Notes
-- Always use `.editorconfig` settings for consistent formatting. Prettier is configured but not enforced via linting.
+- Prefer `domain.action` IPC names such as `journal.list`, `entry.save`, or `journal.unlock`.
+- Keep TODO-specific code isolated unless the task explicitly targets it.
+- Model new journal features in the sidecar and typed services before wiring the UI.
+- Treat roadmap items that are not yet implemented as target architecture, not as permission to break current behavior.

@@ -1,6 +1,6 @@
 {
-  "title": "Tauract",
-  "subtitle": "Task manager",
+  "title": "My Journal",
+  "subtitle": "Your personal journal",
   "footer": "Tauri + React + Bun + SQLite",
   "theme": {
     "change": "Change theme",

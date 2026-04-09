@@ -16,7 +16,7 @@ export function runMigrations(): void {
     // Wrap all DDL in a single transaction for atomicity
     sqlite.run("BEGIN;");
 
-    // v1 — initial schema
+    // v1 — legacy TODO schema (preserved for migration safety)
     sqlite.run(`
       CREATE TABLE IF NOT EXISTS todos (
         id          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -25,6 +25,63 @@ export function runMigrations(): void {
         completed   INTEGER NOT NULL DEFAULT 0,
         created_at  INTEGER NOT NULL,
         updated_at  INTEGER NOT NULL
+      );
+    `);
+
+    // v2 — journal domain
+    sqlite.run(`
+      CREATE TABLE IF NOT EXISTS journals (
+        id             TEXT PRIMARY KEY NOT NULL,
+        name           TEXT NOT NULL,
+        description    TEXT,
+        privacy        TEXT NOT NULL DEFAULT 'public',
+        password_hash  TEXT,
+        wrapped_key    TEXT,
+        key_salt       TEXT,
+        storage_path   TEXT NOT NULL,
+        created_at     INTEGER NOT NULL,
+        updated_at     INTEGER NOT NULL
+      );
+    `);
+
+    sqlite.run(`
+      CREATE TABLE IF NOT EXISTS entries (
+        id            TEXT PRIMARY KEY NOT NULL,
+        journal_id    TEXT NOT NULL REFERENCES journals(id) ON DELETE CASCADE,
+        date          TEXT NOT NULL,
+        title         TEXT NOT NULL,
+        file_path     TEXT NOT NULL,
+        content_hash  TEXT NOT NULL,
+        created_at    INTEGER NOT NULL,
+        updated_at    INTEGER NOT NULL
+      );
+    `);
+
+    sqlite.run(`
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_entries_journal_date
+        ON entries(journal_id, date);
+    `);
+
+    sqlite.run(`
+      CREATE TABLE IF NOT EXISTS tags (
+        id          TEXT PRIMARY KEY NOT NULL,
+        journal_id  TEXT NOT NULL REFERENCES journals(id) ON DELETE CASCADE,
+        name        TEXT NOT NULL
+      );
+    `);
+
+    sqlite.run(`
+      CREATE TABLE IF NOT EXISTS entry_tags (
+        entry_id  TEXT NOT NULL REFERENCES entries(id) ON DELETE CASCADE,
+        tag_id    TEXT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+        PRIMARY KEY (entry_id, tag_id)
+      );
+    `);
+
+    sqlite.run(`
+      CREATE TABLE IF NOT EXISTS app_settings (
+        key    TEXT PRIMARY KEY NOT NULL,
+        value  TEXT NOT NULL
       );
     `);
 

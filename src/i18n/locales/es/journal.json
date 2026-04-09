@@ -1,0 +1,73 @@
+{
+	"welcome": {
+		"title": "Bienvenido a My Journal",
+		"subtitle": "Tu espacio personal para reflexionar, crear y recordar.",
+		"createNew": "Crear nuevo diario",
+		"openExisting": "Abrir diario existente",
+		"importJournal": "Importar diario",
+		"noJournals": "Aún no tienes ningún diario. Crea uno para empezar."
+	},
+	"sidebar": {
+		"journals": "Diarios",
+		"calendar": "Calendario",
+		"newJournal": "Nuevo diario",
+		"settings": "Ajustes"
+	},
+	"journal": {
+		"name": "Nombre del diario",
+		"namePlaceholder": "Mi diario personal",
+		"description": "Descripción",
+		"descriptionPlaceholder": "Una breve descripción de tu diario...",
+		"privacy": "Privacidad",
+		"public": "Público",
+		"private": "Privado",
+		"password": "Contraseña",
+		"passwordPlaceholder": "Introduce una contraseña segura",
+		"confirmPassword": "Confirmar contraseña",
+		"create": "Crear diario",
+		"rename": "Renombrar",
+		"delete": "Eliminar diario",
+		"deleteConfirm": "¿Estás seguro de que quieres eliminar este diario? Esta acción no se puede deshacer.",
+		"locked": "Bloqueado",
+		"unlock": "Desbloquear",
+		"lock": "Bloquear",
+		"open": "Abrir",
+		"entries_one": "{{count}} entrada",
+		"entries_other": "{{count}} entradas",
+		"noEntries": "Sin entradas"
+	},
+	"unlock": {
+		"title": "Diario privado",
+		"message": "Este diario está protegido por contraseña.",
+		"passwordLabel": "Contraseña",
+		"passwordPlaceholder": "Introduce la contraseña",
+		"submit": "Desbloquear",
+		"invalidPassword": "Contraseña incorrecta",
+		"noRecovery": "Si olvidaste la contraseña, no es posible recuperar el contenido."
+	},
+	"entry": {
+		"title": "Título de la entrada",
+		"titlePlaceholder": "¿Qué quieres escribir hoy?",
+		"save": "Guardar",
+		"saving": "Guardando...",
+		"saved": "Guardado",
+		"unsavedChanges": "Tienes cambios sin guardar. ¿Deseas descartarlos?",
+		"delete": "Eliminar entrada",
+		"deleteConfirm": "¿Estás seguro de que quieres eliminar esta entrada?",
+		"noEntry": "No hay ninguna entrada para este día.",
+		"createEntry": "Crear entrada",
+		"editorPlaceholder": "Empieza a escribir..."
+	},
+	"calendar": {
+		"today": "Hoy",
+		"noEntries": "Sin entradas este mes"
+	},
+	"errors": {
+		"loadFailed": "Error al cargar los diarios",
+		"createFailed": "Error al crear el diario",
+		"saveFailed": "Error al guardar la entrada",
+		"deleteFailed": "Error al eliminar",
+		"unlockFailed": "Error al desbloquear el diario",
+		"journalLocked": "Este diario está bloqueado"
+	}
+}

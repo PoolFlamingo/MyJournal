@@ -7,7 +7,7 @@
 export interface IpcRequest {
   /** Unique request identifier for response correlation */
   id: string;
-  /** RPC method name (e.g., "todo.list", "todo.create") */
+  /** RPC method name (e.g., "journal.list", "entry.save") */
   method: string;
   /** Optional parameters for the method */
   params?: Record<string, unknown>;
@@ -27,12 +27,32 @@ export type IpcResponse = IpcSuccessResponse | IpcErrorResponse;
 
 /** All available RPC methods */
 export type IpcMethod =
+  // Legacy TODO (preserved until scaffold removal)
   | "todo.list"
   | "todo.get"
   | "todo.create"
   | "todo.update"
   | "todo.delete"
-  | "ping";
+  // App lifecycle
+  | "ping"
+  | "app.bootstrap"
+  | "app.setSetting"
+  | "app.getSetting"
+  // Journal domain
+  | "journal.list"
+  | "journal.create"
+  | "journal.open"
+  | "journal.rename"
+  | "journal.delete"
+  | "journal.unlock"
+  | "journal.lock"
+  // Entry domain
+  | "entry.getByDate"
+  | "entry.save"
+  | "entry.delete"
+  | "entry.listMonth";
+
+// ── Legacy TODO params (preserved) ────────────────────────────────────
 
 /** Params for todo.create */
 export interface CreateTodoParams {
@@ -46,6 +66,17 @@ export interface UpdateTodoParams {
   title?: string;
   description?: string | null;
   completed?: boolean;
+}
+
+/** Params for todo.get / todo.delete */
+export interface TodoByIdParams {
+  id: number;
+}
+
+/** Params for todo.list */
+export interface ListTodosParams {
+  completed?: boolean;
+  search?: string;
 }
 
 /** Params for todo.get / todo.delete */
