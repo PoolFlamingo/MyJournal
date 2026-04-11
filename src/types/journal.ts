@@ -8,6 +8,7 @@ export type JournalPrivacy = "public" | "private";
 export interface JournalSummary {
 	id: string;
 	name: string;
+	description?: string | null;
 	privacy: JournalPrivacy;
 	isLocked: boolean;
 	entryCount: number;
@@ -16,7 +17,6 @@ export interface JournalSummary {
 }
 
 export interface JournalDetails extends JournalSummary {
-	description: string | null;
 	storagePath: string;
 }
 

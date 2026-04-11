@@ -1,6 +1,7 @@
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { JournalSidebar } from "@/components/journal/JournalSidebar";
 import { EntryEditor } from "@/components/journal/EntryEditor";
+import { BookOpenText } from "lucide-react";
 import type {
 	JournalSummary,
 	JournalDetails,
@@ -8,6 +9,7 @@ import type {
 	EntryDocument,
 	SaveEntryDto,
 } from "@/types/journal";
+import { Separator } from "@/components/ui/separator";
 
 interface JournalWorkspaceProps {
 	journals: JournalSummary[];
@@ -53,19 +55,30 @@ export function JournalWorkspace({
 				onLockJournal={(id) => onLockJournal(id)}
 				onCreateJournal={onRequestCreateJournal}
 			/>
-			<SidebarInset>
-				<header className="flex items-center gap-2 border-b px-4 py-2">
-					<SidebarTrigger />
-					<h2 className="text-sm font-semibold">{activeJournal.name}</h2>
+			<SidebarInset className="bg-background flex flex-col h-screen overflow-hidden">
+				<header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+					<SidebarTrigger className="text-muted-foreground hover:text-foreground" />
+					<Separator orientation="vertical" className="h-4 bg-border/60" />
+					<div className="flex items-center gap-2">
+						<BookOpenText className="size-4 text-primary" />
+						<h2 className="text-sm font-semibold tracking-tight">{activeJournal.name}</h2>
+						{activeJournal.privacy === "private" && (
+							<span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-primary">
+								Privado
+							</span>
+						)}
+					</div>
 				</header>
-				<EntryEditor
-					journalId={activeJournal.id}
-					selectedDate={selectedDate}
-					entry={currentEntry}
-					loading={entryLoading}
-					onSave={onSaveEntry}
-					onDelete={onDeleteEntry}
-				/>
+				<main className="flex-1 overflow-hidden relative">
+					<EntryEditor
+						journalId={activeJournal.id}
+						selectedDate={selectedDate}
+						entry={currentEntry}
+						loading={entryLoading}
+						onSave={onSaveEntry}
+						onDelete={onDeleteEntry}
+					/>
+				</main>
 			</SidebarInset>
 		</SidebarProvider>
 	);

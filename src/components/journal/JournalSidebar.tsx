@@ -16,8 +16,9 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { LanguageSwitch } from "@/components/language-switch";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { BookOpen, Plus, Lock, Unlock } from "lucide-react";
+import { BookText, Plus, Lock, Unlock, LayoutDashboard, ChevronRight } from "lucide-react";
 import type { JournalSummary, CalendarDayState } from "@/types/journal";
+import { cn } from "@/lib/utils";
 
 interface JournalSidebarProps {
 	journals: JournalSummary[];
@@ -61,16 +62,24 @@ export function JournalSidebar({
 	}
 
 	return (
-		<Sidebar>
-			<SidebarHeader className="p-4">
-				<h1 className="text-lg font-bold text-foreground">My Journal</h1>
+		<Sidebar className="border-r border-border/40 bg-sidebar">
+			<SidebarHeader className="flex flex-row items-center gap-2 p-5 pb-2">
+				<div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+					<LayoutDashboard className="size-4" />
+				</div>
+				<div className="flex flex-col gap-0.5 leading-none">
+					<span className="font-bold tracking-tight text-sidebar-foreground">My Journal</span>
+					<span className="text-[10px] text-muted-foreground uppercase tracking-widest">Workspace</span>
+				</div>
 			</SidebarHeader>
 
-			<SidebarContent>
+			<SidebarContent className="px-3 pb-4">
 				{/* Calendar section */}
-				<SidebarGroup>
-					<SidebarGroupLabel>{t("sidebar.calendar")}</SidebarGroupLabel>
-					<SidebarGroupContent className="px-2">
+				<SidebarGroup className="mt-4">
+					<SidebarGroupLabel className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+						{t("sidebar.calendar", "Calendario")}
+					</SidebarGroupLabel>
+					<SidebarGroupContent className="mt-2 rounded-xl border border-border/50 bg-background/50 shadow-sm">
 						<Calendar
 							mode="single"
 							selected={selectedDateObj}
@@ -83,42 +92,43 @@ export function JournalSidebar({
 								},
 							}}
 							modifiersClassNames={{
-								hasEntry:
-									"bg-primary/20 font-bold text-primary",
+								hasEntry: "relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-primary font-medium text-primary",
 							}}
-							className="w-full"
+							className="w-full p-2"
 						/>
 					</SidebarGroupContent>
 				</SidebarGroup>
 
-				<Separator />
-
 				{/* Journals section */}
-				<SidebarGroup>
-					<SidebarGroupLabel>
-						<span className="flex-1">{t("sidebar.journals")}</span>
+				<SidebarGroup className="mt-6">
+					<SidebarGroupLabel className="flex w-full items-center justify-between px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+						<span>{t("sidebar.journals", "Tus diarios")}</span>
 						<Button
 							variant="ghost"
 							size="icon"
-							className="size-6"
+							className="h-5 w-5 text-muted-foreground hover:bg-primary/20 hover:text-primary transition-colors"
 							onClick={onCreateJournal}
 							title={t("sidebar.newJournal")}
 						>
-							<Plus className="size-4" />
+							<Plus className="size-3.5" />
 						</Button>
 					</SidebarGroupLabel>
-					<SidebarGroupContent>
+					<SidebarGroupContent className="mt-2 space-y-1">
 						<SidebarMenu>
 							{journals.map((journal) => (
 								<SidebarMenuItem key={journal.id}>
 									<SidebarMenuButton
 										isActive={journal.id === activeJournalId}
 										onClick={() => onOpenJournal(journal.id)}
+										className={cn(
+											"h-10 rounded-lg border border-transparent px-3 text-sm transition-all",
+											journal.id === activeJournalId
+												? "bg-primary text-primary-foreground font-medium shadow-sm hover:bg-primary hover:text-primary-foreground"
+												: "hover:bg-muted/60 text-sidebar-foreground group"
+										)}
 									>
-										<BookOpen className="size-4" />
-										<span className="flex-1 truncate">
-											{journal.name}
-										</span>
+										<BookText className={cn("size-4 shrink-0 transition-colors", journal.id === activeJournalId ? "text-primary-foreground/80" : "text-muted-foreground group-hover:text-primary")} />
+										<span className="flex-1 truncate">{journal.name}</span>
 										{journal.privacy === "private" && (
 											<button
 												onClick={(e) => {
@@ -127,7 +137,12 @@ export function JournalSidebar({
 														onLockJournal(journal.id);
 													}
 												}}
-												className="text-muted-foreground hover:text-foreground"
+												className={cn(
+													"shrink-0 rounded-md p-1 transition-colors",
+													journal.id === activeJournalId 
+														? "hover:bg-primary-foreground/20 text-primary-foreground/80"
+														: "hover:bg-muted-foreground/20 text-muted-foreground"
+												)}
 												title={
 													journal.isLocked
 														? t("journal.locked")
@@ -149,9 +164,11 @@ export function JournalSidebar({
 				</SidebarGroup>
 			</SidebarContent>
 
-			<SidebarFooter className="flex flex-row items-center gap-2 p-4">
-				<ThemeToggle />
-				<LanguageSwitch />
+			<SidebarFooter className="flex flex-row items-center justify-between border-t border-border/40 p-4 bg-sidebar">
+				<div className="flex gap-1.5">
+					<ThemeToggle />
+					<LanguageSwitch />
+				</div>
 			</SidebarFooter>
 		</Sidebar>
 	);
