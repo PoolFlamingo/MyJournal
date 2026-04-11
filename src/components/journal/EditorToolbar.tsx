@@ -27,6 +27,7 @@ import {
 	Highlighter,
 	Undo2,
 	Redo2,
+	Table,
 } from "lucide-react";
 
 interface ToolbarButtonProps {
@@ -79,6 +80,18 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 		if (url) {
 			editor.chain().focus().setImage({ src: url }).run();
 		}
+	}, [editor, t]);
+
+	const insertTable = useCallback(() => {
+		const rows = window.prompt(t("toolbar.tableRows", "Número de filas:"), "3");
+		if (rows === null) return;
+		const cols = window.prompt(t("toolbar.tableColumns", "Número de columnas:"), "3");
+		if (cols === null) return;
+		
+		const rowsNum = Math.max(1, parseInt(rows, 10) || 3);
+		const colsNum = Math.max(1, parseInt(cols, 10) || 3);
+		
+		editor.chain().focus().insertTable({ rows: rowsNum, cols: colsNum, withHeaderRow: true }).run();
 	}, [editor, t]);
 
 	return (
@@ -247,6 +260,12 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 				active={false}
 				title={t("toolbar.image")}
 				icon={<Image className="size-3.5" />}
+			/>
+			<ToolbarButton
+				action={insertTable}
+				active={editor.isActive("table")}
+				title={t("toolbar.table")}
+				icon={<Table className="size-3.5" />}
 			/>
 		</div>
 	);

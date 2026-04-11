@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, gte, lt } from "drizzle-orm";
 import { db } from "../db";
 import { entries, journals } from "../db/schema";
 import type {

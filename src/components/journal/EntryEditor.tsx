@@ -12,6 +12,10 @@ import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import CharacterCount from "@tiptap/extension-character-count";
+import { Table } from "@tiptap/extension-table";
+import { TableRow } from "@tiptap/extension-table-row";
+import { TableHeader } from "@tiptap/extension-table-header";
+import { TableCell } from "@tiptap/extension-table-cell";
 import { createLowlight, common } from "lowlight";
 import { Button } from "@/components/ui/button";
 import { Save, Trash2, CalendarHeart, Loader2 } from "lucide-react";
@@ -38,6 +42,21 @@ interface EntryEditorProps {
 	loading: boolean;
 	onSave: (data: SaveEntryDto) => Promise<void>;
 	onDelete: (date: string) => Promise<void>;
+	onCommandsChange?: (commands: EntryEditorCommands) => void;
+}
+
+export interface EntryEditorCommands {
+	save: () => Promise<void>;
+	deleteEntry: () => Promise<void>;
+	undo: () => void;
+	redo: () => void;
+	toggleBold: () => void;
+	toggleItalic: () => void;
+	toggleUnderline: () => void;
+	canUndo: boolean;
+	canRedo: boolean;
+	canSave: boolean;
+	canDelete: boolean;
 }
 
 export function EntryEditor({
@@ -47,11 +66,13 @@ export function EntryEditor({
 	loading,
 	onSave,
 	onDelete,
+	onCommandsChange,
 }: EntryEditorProps) {
 	const { t } = useTranslation("journal");
 	const [title, setTitle] = useState("");
 	const [saving, setSaving] = useState(false);
 	const [dirty, setDirty] = useState(false);
+	const [editorEpoch, setEditorEpoch] = useState(0);
 
 	const editor = useEditor({
 		extensions: [
@@ -66,10 +87,18 @@ export function EntryEditor({
 			TaskItem.configure({ nested: true }),
 			CodeBlockLowlight.configure({ lowlight }),
 			CharacterCount,
+			Table.configure({ resizable: true }),
+			TableRow,
+			TableHeader,
+			TableCell,
 		],
 		content: "",
 		onUpdate: () => {
 			setDirty(true);
+			setEditorEpoch((prev) => prev + 1);
+		},
+		onSelectionUpdate: () => {
+			setEditorEpoch((prev) => prev + 1);
 		},
 		editorProps: {
 			attributes: {
@@ -112,6 +141,52 @@ export function EntryEditor({
 		}
 	}, [journalId, selectedDate, title, editor, onSave]);
 
+	useEffect(() => {
+		if (!onCommandsChange) return;
+
+		const canUndo = editor ? editor.can().chain().focus().undo().run() : false;
+		const canRedo = editor ? editor.can().chain().focus().redo().run() : false;
+		const hasContent = editor ? !editor.isEmpty : false;
+		const hasTitle = title.trim().length > 0;
+
+		onCommandsChange({
+			save: handleSave,
+			deleteEntry: async () => {
+				if (!entry) return;
+				await onDelete(selectedDate);
+			},
+			undo: () => {
+				editor?.chain().focus().undo().run();
+			},
+			redo: () => {
+				editor?.chain().focus().redo().run();
+			},
+			toggleBold: () => {
+				editor?.chain().focus().toggleBold().run();
+			},
+			toggleItalic: () => {
+				editor?.chain().focus().toggleItalic().run();
+			},
+			toggleUnderline: () => {
+				editor?.chain().focus().toggleUnderline().run();
+			},
+			canUndo,
+			canRedo,
+			canSave: !saving && (hasTitle || hasContent),
+			canDelete: Boolean(entry),
+		});
+	}, [
+		editor,
+		editorEpoch,
+		entry,
+		handleSave,
+		onCommandsChange,
+		onDelete,
+		selectedDate,
+		saving,
+		title,
+	]);
+
 	const handleKeyDown = useCallback(
 		(e: React.KeyboardEvent) => {
 			if ((e.ctrlKey || e.metaKey) && e.key === "s") {
@@ -141,11 +216,11 @@ export function EntryEditor({
 	}
 
 	return (
-		<div className="flex flex-col h-full bg-background" onKeyDown={handleKeyDown}>
+		<div className="flex flex-col h-full bg-background overflow-hidden" onKeyDown={handleKeyDown}>
 			{/* Top Actions Bar */}
-			<div className="flex items-center justify-between px-6 py-4 bg-background/95 backdrop-blur z-20 border-b border-border/40">
+			<div className="flex items-center justify-between px-6 py-4 bg-background z-20">
 				<div className="flex items-center gap-2">
-					<div className="flex h-8 items-center rounded-lg bg-muted/50 px-3 border border-border/50">
+					<div className="flex h-8 items-center rounded-lg bg-muted/30 px-3 border border-border/40">
 						<CalendarHeart className="mr-2 size-4 text-primary" />
 						<span className="text-sm font-medium capitalize text-muted-foreground tracking-tight">
 							{formattedDate}
@@ -164,7 +239,7 @@ export function EntryEditor({
 							</span>
 						)
 					)}
-					<div className="flex items-center gap-1.5 bg-muted/40 p-1 rounded-xl">
+					<div className="flex items-center gap-1.5 bg-muted/30 p-1 rounded-xl">
 						{entry && (
 							<Button
 								size="sm"
@@ -180,7 +255,7 @@ export function EntryEditor({
 							size="sm"
 							onClick={() => void handleSave()}
 							disabled={saving || (!title.trim() && (!editor || editor.isEmpty))}
-							className="h-8 rounded-lg font-medium tracking-wide"
+							className="h-8 rounded-lg font-medium tracking-wide shadow-sm"
 						>
 							{saving ? (
 								<Loader2 className="mr-2 size-4 animate-spin" />
@@ -193,27 +268,26 @@ export function EntryEditor({
 				</div>
 			</div>
 
-			<div className="flex-1 overflow-y-auto w-full mx-auto pb-32">
-				<div className="mx-auto max-w-3xl w-full px-6 md:px-12 mt-12 transition-all">
-					{/* Title Input as Auto-resizing Textarea */}
-					<TextareaAutosize
-						value={title}
-						onChange={handleTitleChange}
-						placeholder={t("entry.titlePlaceholder", "Título de hoy...")}
-						className="w-full resize-none border-none bg-transparent p-0 text-4xl font-extrabold tracking-tight text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-0 sm:text-5xl"
-						minRows={1}
-					/>
-
-					{/* Formatting toolbar floating/sticky */}
-					<div className="sticky top-0 z-30 -mx-2 mt-8 mb-4">
-						<div className="rounded-xl border border-border/50 bg-background/95 p-1 shadow-sm backdrop-blur supports-backdrop-filter:bg-background/60">
-							{editor && <EditorToolbar editor={editor} />}
+			{/* Main Editor Container with Border */}
+			<div className="flex-1 px-8 pb-8 overflow-y-auto">
+				<div className="mx-auto max-w-4xl min-h-full flex flex-col bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden ring-1 ring-border/5">
+					{editor && (
+						<div className="border-b border-border/40 bg-muted/10">
+							<EditorToolbar editor={editor} />
 						</div>
-					</div>
-
-					{/* TipTap rich text editor content */}
-					<div className="mt-4">
-						<EditorContent editor={editor} />
+					)}
+					
+					<div className="flex flex-col flex-1 p-8 md:p-12">
+						<TextareaAutosize
+							placeholder={t("entry.titlePlaceholder", "¿Qué quieres escribir hoy?")}
+							value={title}
+							onChange={handleTitleChange}
+							className="w-full bg-transparent border-none text-4xl md:text-5xl font-extrabold focus:outline-none placeholder:text-muted-foreground/20 mb-8 resize-none leading-tight tracking-tight"
+						/>
+						
+						<div className="flex-1">
+							<EditorContent editor={editor} />
+						</div>
 					</div>
 				</div>
 			</div>

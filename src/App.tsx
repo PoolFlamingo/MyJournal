@@ -55,7 +55,7 @@ function App() {
 					onMonthChange={journal.loadMonth}
 					onOpenJournal={journal.openJournal}
 					onLockJournal={journal.lockJournal}
-					onRequestCreateJournal={() => {/* TODO: open create dialog from workspace */}}
+					onRequestCreateJournal={journal.createJournal}
 					onSaveEntry={journal.saveEntry}
 					onDeleteEntry={journal.deleteEntry}
 				/>

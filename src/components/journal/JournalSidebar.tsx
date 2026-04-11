@@ -13,10 +13,9 @@ import {
 	SidebarMenuItem,
 	SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import { LanguageSwitch } from "@/components/language-switch";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { BookText, Plus, Lock, Unlock, LayoutDashboard, ChevronRight } from "lucide-react";
+import { BookText, Plus, Lock, Unlock, LayoutDashboard } from "lucide-react";
 import type { JournalSummary, CalendarDayState } from "@/types/journal";
 import { cn } from "@/lib/utils";
 
@@ -53,8 +52,10 @@ export function JournalSidebar({
 
 	function handleDateSelect(date: Date | undefined) {
 		if (!date) return;
-		const iso = date.toISOString().split("T")[0];
-		onSelectDate(iso);
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, "0");
+		const day = String(date.getDate()).padStart(2, "0");
+		onSelectDate(`${year}-${month}-${day}`);
 	}
 
 	function handleMonthChange(month: Date) {
@@ -87,8 +88,10 @@ export function JournalSidebar({
 							onMonthChange={handleMonthChange}
 							modifiers={{
 								hasEntry: (date) => {
-									const iso = date.toISOString().split("T")[0];
-									return datesWithEntries.has(iso);
+									const y = date.getFullYear();
+									const m = String(date.getMonth() + 1).padStart(2, "0");
+									const d = String(date.getDate()).padStart(2, "0");
+									return datesWithEntries.has(`${y}-${m}-${d}`);
 								},
 							}}
 							modifiersClassNames={{
