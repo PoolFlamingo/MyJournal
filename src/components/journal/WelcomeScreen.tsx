@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Dialog,
 	DialogContent,
@@ -44,6 +45,7 @@ export function WelcomeScreen({
 	const [privacy, setPrivacy] = useState<JournalPrivacy>("public");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
+	const [titleRequired, setTitleRequired] = useState(true);
 
 	async function handleCreate() {
 		if (!name.trim()) return;
@@ -56,6 +58,7 @@ export function WelcomeScreen({
 				description: description.trim() || undefined,
 				privacy,
 				password: privacy === "private" ? password : undefined,
+				titleRequired,
 			});
 			setShowCreateDialog(false);
 			resetForm();
@@ -70,6 +73,7 @@ export function WelcomeScreen({
 		setPrivacy("public");
 		setPassword("");
 		setConfirmPassword("");
+		setTitleRequired(true);
 	}
 
 	return (
@@ -244,6 +248,26 @@ export function WelcomeScreen({
 								</div>
 							</div>
 						)}
+						
+						{/* Title Required Option */}
+						<div className="border-t border-border/50 pt-4">
+							<div className="flex items-start gap-3">
+								<Checkbox
+									id="title-required"
+									checked={titleRequired}
+									onCheckedChange={(checked) => setTitleRequired(checked === true)}
+									className="mt-1"
+								/>
+								<div className="flex-1">
+									<Label htmlFor="title-required" className="text-sm font-medium cursor-pointer">
+										{t("journal.titleRequired", "Título requerido")}
+									</Label>
+									<p className="text-xs text-muted-foreground mt-1">
+										{t("journal.titleRequiredDescription", "Requerir que las entradas tengan un título.")}
+									</p>
+								</div>
+							</div>
+						</div>
 					</div>
 					<DialogFooter className="gap-2 sm:gap-0">
 						<Button variant="ghost" onClick={() => setShowCreateDialog(false)}>

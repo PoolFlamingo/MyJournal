@@ -20,6 +20,7 @@ export interface JournalSummary {
 /** Full journal details (only available when unlocked) */
 export interface JournalDetails extends JournalSummary {
 	description: string | null;
+	titleRequired: boolean;
 	storagePath: string;
 }
 
@@ -29,6 +30,7 @@ export interface CreateJournalParams {
 	description?: string;
 	privacy: JournalPrivacy;
 	password?: string;
+	titleRequired?: boolean;
 }
 
 /** Params for journal.rename */

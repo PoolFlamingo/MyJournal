@@ -18,6 +18,7 @@ export interface JournalSummary {
 
 export interface JournalDetails extends JournalSummary {
 	storagePath: string;
+	titleRequired: boolean;
 }
 
 export interface CreateJournalDto {
@@ -25,6 +26,7 @@ export interface CreateJournalDto {
 	description?: string;
 	privacy: JournalPrivacy;
 	password?: string;
+	titleRequired?: boolean;
 }
 
 export interface CalendarDayState {

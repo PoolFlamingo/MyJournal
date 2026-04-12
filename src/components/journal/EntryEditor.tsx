@@ -18,7 +18,7 @@ import { TableHeader } from "@tiptap/extension-table-header";
 import { TableCell } from "@tiptap/extension-table-cell";
 import { createLowlight, common } from "lowlight";
 import { Button } from "@/components/ui/button";
-import { Save, Trash2, CalendarHeart, Loader2 } from "lucide-react";
+import { Save, Trash2, CalendarHeart, Loader2, Edit2 } from "lucide-react";
 import type { EntryDocument, SaveEntryDto } from "@/types/journal";
 import { EditorToolbar } from "./EditorToolbar";
 import TextareaAutosize from "react-textarea-autosize";
@@ -35,11 +35,79 @@ function parseContent(content: string): object | string {
 	}
 }
 
+function renderReadOnlyContent(content: string): React.ReactNode {
+	if (!content) return null;
+	try {
+		const parsed = JSON.parse(content) as any;
+		if (!parsed.content || !Array.isArray(parsed.content)) {
+			return <p className="text-foreground">{content}</p>;
+		}
+
+		return parsed.content.map((node: any, idx: number) => {
+			if (node.type === "paragraph") {
+				const text = node.content?.map((mark: any) => mark.text).join("") || "";
+				return (
+					<p key={idx} className="mb-4 text-foreground">
+						{text}
+					</p>
+				);
+			}
+			if (node.type === "heading") {
+				const level = (node.attrs?.level || 2) as number;
+				const text = node.content?.map((mark: any) => mark.text).join("") || "";
+				const classMap: Record<number, string> = {
+					1: "text-2xl font-bold mb-4",
+					2: "text-xl font-bold mb-3",
+					3: "text-lg font-bold mb-3",
+				};
+				const className = classMap[level] || "text-lg font-bold mb-3";
+				return (
+					<div key={idx} className={className}>
+						{text}
+					</div>
+				);
+			}
+			if (node.type === "bulletList" || node.type === "orderedList") {
+				const isOrdered = node.type === "orderedList";
+				return (
+					<ul key={idx} className={`mb-4 ${isOrdered ? "list-decimal" : "list-disc"} list-inside text-foreground`}>
+						{node.content?.map((item: any, i: number) => (
+							<li key={i} className="mb-1">
+								{item.content?.map((mark: any) => mark.text).join("")}
+							</li>
+						))}
+					</ul>
+				);
+			}
+			if (node.type === "blockquote") {
+				const text = node.content?.map((para: any) => para.content?.map((mark: any) => mark.text).join("")).join(" ") || "";
+				return (
+					<blockquote key={idx} className="mb-4 border-l-4 border-primary pl-4 italic text-muted-foreground">
+						{text}
+					</blockquote>
+				);
+			}
+			if (node.type === "codeBlock") {
+				const text = node.content?.map((mark: any) => mark.text).join("") || "";
+				return (
+					<pre key={idx} className="mb-4 bg-muted p-4 rounded overflow-auto text-sm">
+						<code className="text-foreground">{text}</code>
+					</pre>
+				);
+			}
+			return null;
+		});
+	} catch {
+		return <p className="text-foreground">{content}</p>;
+	}
+}
+
 interface EntryEditorProps {
 	journalId: string;
 	selectedDate: string;
 	entry: EntryDocument | null;
 	loading: boolean;
+	titleRequired: boolean;
 	onSave: (data: SaveEntryDto) => Promise<void>;
 	onDelete: (date: string) => Promise<void>;
 	onCommandsChange?: (commands: EntryEditorCommands) => void;
@@ -64,6 +132,7 @@ export function EntryEditor({
 	selectedDate,
 	entry,
 	loading,
+	titleRequired,
 	onSave,
 	onDelete,
 	onCommandsChange,
@@ -73,6 +142,7 @@ export function EntryEditor({
 	const [saving, setSaving] = useState(false);
 	const [dirty, setDirty] = useState(false);
 	const [editorEpoch, setEditorEpoch] = useState(0);
+	const [isEditMode, setIsEditMode] = useState(!entry); // Start in edit mode only if new entry
 
 	const editor = useEditor({
 		extensions: [
@@ -111,6 +181,7 @@ export function EntryEditor({
 	useEffect(() => {
 		setTitle(entry?.title ?? "");
 		setDirty(false);
+		setIsEditMode(!entry); // Start in edit mode only if new entry
 		if (editor) {
 			editor.commands.setContent(parseContent(entry?.content ?? ""), false);
 		}
@@ -122,10 +193,12 @@ export function EntryEditor({
 	}, []);
 
 	const handleSave = useCallback(async () => {
-		// Allow saving empty titles if there is content, or empty content if there is title
+		// Validate title requirement
 		const hasContent = editor && !editor.isEmpty;
 		const hasTitle = title.trim().length > 0;
-		if (!hasTitle && !hasContent) return;
+		
+		if (titleRequired && !hasTitle) return; // Title is required
+		if (!hasTitle && !hasContent) return; // Must have either title or content
 
 		setSaving(true);
 		try {
@@ -139,7 +212,7 @@ export function EntryEditor({
 		} finally {
 			setSaving(false);
 		}
-	}, [journalId, selectedDate, title, editor, onSave]);
+	}, [journalId, selectedDate, title, editor, onSave, titleRequired]);
 
 	useEffect(() => {
 		if (!onCommandsChange) return;
@@ -216,7 +289,7 @@ export function EntryEditor({
 	}
 
 	return (
-		<div className="flex flex-col h-full bg-background overflow-hidden" onKeyDown={handleKeyDown}>
+		<div className="flex flex-col h-full bg-background overflow-hidden" onKeyDown={isEditMode ? handleKeyDown : undefined}>
 			{/* Top Actions Bar */}
 			<div className="flex items-center justify-between px-6 py-4 bg-background z-20">
 				<div className="flex items-center gap-2">
@@ -228,19 +301,48 @@ export function EntryEditor({
 					</div>
 				</div>
 				<div className="flex items-center gap-3">
-					{dirty ? (
-						<span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 hidden sm:inline-block">
-							{t("entry.save", "Sin guardar (Ctrl+S)")}
-						</span>
+					{isEditMode ? (
+						<>
+							{dirty ? (
+								<span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 hidden sm:inline-block">
+									{t("entry.save", "Sin guardar (Ctrl+S)")}
+								</span>
+							) : (
+								entry && (
+									<span className="text-xs font-semibold uppercase tracking-wider text-emerald-500/80 hidden sm:inline-block">
+										{t("entry.saved", "Guardado")}
+									</span>
+								)
+							)}
+							<div className="flex items-center gap-1.5 bg-muted/30 p-1 rounded-xl">
+								{entry && (
+									<Button
+										size="sm"
+										variant="ghost"
+										onClick={() => void onDelete(selectedDate)}
+										className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+										title={t("entry.delete", "Eliminar entrada")}
+									>
+										<Trash2 className="size-4" />
+									</Button>
+								)}
+								<Button
+									size="sm"
+									onClick={() => void handleSave()}
+									disabled={saving || (titleRequired ? !title.trim() : !title.trim() && (!editor || editor.isEmpty))}
+									className="h-8 rounded-lg font-medium tracking-wide shadow-sm"
+								>
+									{saving ? (
+										<Loader2 className="mr-2 size-4 animate-spin" />
+									) : (
+										<Save className="mr-2 size-4" />
+									)}
+									{saving ? t("entry.saving", "Guardando...") : t("entry.saveBtn", "Guardar")}
+								</Button>
+							</div>
+						</>
 					) : (
-						entry && (
-							<span className="text-xs font-semibold uppercase tracking-wider text-emerald-500/80 hidden sm:inline-block">
-								{t("entry.saved", "Guardado")}
-							</span>
-						)
-					)}
-					<div className="flex items-center gap-1.5 bg-muted/30 p-1 rounded-xl">
-						{entry && (
+						<div className="flex items-center gap-1.5 bg-muted/30 p-1 rounded-xl">
 							<Button
 								size="sm"
 								variant="ghost"
@@ -250,45 +352,55 @@ export function EntryEditor({
 							>
 								<Trash2 className="size-4" />
 							</Button>
-						)}
-						<Button
-							size="sm"
-							onClick={() => void handleSave()}
-							disabled={saving || (!title.trim() && (!editor || editor.isEmpty))}
-							className="h-8 rounded-lg font-medium tracking-wide shadow-sm"
-						>
-							{saving ? (
-								<Loader2 className="mr-2 size-4 animate-spin" />
-							) : (
-								<Save className="mr-2 size-4" />
-							)}
-							{saving ? t("entry.saving", "Guardando...") : t("entry.saveBtn", "Guardar")}
-						</Button>
-					</div>
+							<Button
+								size="sm"
+								onClick={() => setIsEditMode(true)}
+								className="h-8 rounded-lg font-medium tracking-wide shadow-sm"
+							>
+								<Edit2 className="mr-2 size-4" />
+								{t("entry.edit", "Editar")}
+							</Button>
+						</div>
+					)}
 				</div>
 			</div>
 
-			{/* Main Editor Container with Border */}
+			{/* Main Content */}
 			<div className="flex-1 px-8 pb-8 overflow-y-auto">
 				<div className="mx-auto max-w-4xl min-h-full flex flex-col bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden ring-1 ring-border/5">
-					{editor && (
-						<div className="border-b border-border/40 bg-muted/10">
-							<EditorToolbar editor={editor} />
+					{isEditMode ? (
+						<>
+							{editor && (
+								<div className="border-b border-border/40 bg-muted/10">
+									<EditorToolbar editor={editor} />
+								</div>
+							)}
+							
+							<div className="flex flex-col flex-1 p-8 md:p-12">
+								<TextareaAutosize
+									placeholder={t("entry.titlePlaceholder", "¿Qué quieres escribir hoy?")}
+									value={title}
+									onChange={handleTitleChange}
+									className="w-full bg-transparent border-none text-4xl md:text-5xl font-extrabold focus:outline-none placeholder:text-muted-foreground/20 mb-8 resize-none leading-tight tracking-tight"
+								/>
+								
+								<div className="flex-1">
+									<EditorContent editor={editor} />
+								</div>
+							</div>
+						</>
+					) : (
+						// Read-only view
+						<div className="flex flex-col flex-1 p-8 md:p-12">
+							<h1 className="text-4xl md:text-5xl font-extrabold mb-8 text-foreground leading-tight tracking-tight">
+								{title || t("entry.noTitle", "Sin título")}
+							</h1>
+							
+							<div className="flex-1">
+								{entry?.content ? renderReadOnlyContent(entry.content) : <p className="text-muted-foreground">{t("entry.noEntry", "No hay contenido")}</p>}
+							</div>
 						</div>
 					)}
-					
-					<div className="flex flex-col flex-1 p-8 md:p-12">
-						<TextareaAutosize
-							placeholder={t("entry.titlePlaceholder", "¿Qué quieres escribir hoy?")}
-							value={title}
-							onChange={handleTitleChange}
-							className="w-full bg-transparent border-none text-4xl md:text-5xl font-extrabold focus:outline-none placeholder:text-muted-foreground/20 mb-8 resize-none leading-tight tracking-tight"
-						/>
-						
-						<div className="flex-1">
-							<EditorContent editor={editor} />
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>

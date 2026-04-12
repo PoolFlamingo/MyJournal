@@ -78,9 +78,6 @@ export async function saveEntry(params: SaveEntryParams): Promise<EntrySummary> 
   if (!params.journalId || !params.date) {
     throw new Error("journalId and date are required");
   }
-  if (!params.title?.trim()) {
-    throw new Error("Entry title is required");
-  }
 
   const storagePath = getJournalStoragePath(params.journalId);
   if (!storagePath) throw new Error("Journal not found");

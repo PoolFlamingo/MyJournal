@@ -130,6 +130,7 @@ export async function createJournal(params: CreateJournalParams): Promise<Journa
       passwordHash,
       wrappedKey: null,
       keySalt: null,
+      titleRequired: params.titleRequired !== false,
       storagePath,
       createdAt: now,
       updatedAt: now,
@@ -161,6 +162,7 @@ export async function openJournal(params: { id: string }): Promise<JournalDetail
   return {
     ...toJournalSummary(journal),
     description: journal.description,
+    titleRequired: journal.titleRequired,
     storagePath: journal.storagePath,
   };
 }

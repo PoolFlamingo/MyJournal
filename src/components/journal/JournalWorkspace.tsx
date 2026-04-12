@@ -38,6 +38,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
 	Select,
 	SelectContent,
@@ -89,6 +90,7 @@ export function JournalWorkspace({
 	const [privacy, setPrivacy] = useState<JournalPrivacy>("public");
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
+	const [titleRequired, setTitleRequired] = useState(true);
 	const [editorCommands, setEditorCommands] = useState<EntryEditorCommands | null>(null);
 
 	const resetCreateForm = () => {
@@ -97,6 +99,7 @@ export function JournalWorkspace({
 		setPrivacy("public");
 		setPassword("");
 		setConfirmPassword("");
+		setTitleRequired(true);
 	};
 
 	const handleCreateJournal = async () => {
@@ -110,6 +113,7 @@ export function JournalWorkspace({
 				description: description.trim() || undefined,
 				privacy,
 				password: privacy === "private" ? password : undefined,
+				titleRequired,
 			});
 			setShowCreateDialog(false);
 			resetCreateForm();
@@ -254,6 +258,7 @@ export function JournalWorkspace({
 						selectedDate={selectedDate}
 						entry={currentEntry}
 						loading={entryLoading}
+						titleRequired={activeJournal.titleRequired}
 						onSave={onSaveEntry}
 						onDelete={onDeleteEntry}
 						onCommandsChange={setEditorCommands}
@@ -324,6 +329,26 @@ export function JournalWorkspace({
 								</div>
 							</div>
 						)}
+						
+						{/* Title Required Option */}
+						<div className="border-t border-border/50 pt-4">
+							<div className="flex items-start gap-3">
+								<Checkbox
+									id="title-required"
+									checked={titleRequired}
+									onCheckedChange={(checked) => setTitleRequired(checked === true)}
+									className="mt-1"
+								/>
+								<div className="flex-1">
+									<Label htmlFor="title-required" className="text-sm font-medium cursor-pointer">
+										{t("journal.titleRequired", "Título requerido")}
+									</Label>
+									<p className="text-xs text-muted-foreground mt-1">
+										{t("journal.titleRequiredDescription", "Requerir que las entradas tengan un título.")}
+									</p>
+								</div>
+							</div>
+						</div>
 					</div>
 					<DialogFooter>
 						<Button variant="ghost" onClick={() => setShowCreateDialog(false)}>

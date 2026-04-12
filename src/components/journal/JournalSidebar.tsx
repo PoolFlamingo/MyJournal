@@ -12,11 +12,13 @@ import {
 	SidebarMenu,
 	SidebarMenuItem,
 	SidebarMenuButton,
+	SidebarMenuAction,
 } from "@/components/ui/sidebar";
 import { LanguageSwitch } from "@/components/language-switch";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { BookText, Plus, Lock, Unlock, LayoutDashboard } from "lucide-react";
 import type { JournalSummary, CalendarDayState } from "@/types/journal";
+import { useWeekStart } from "@/hooks/useWeekStart";
 import { cn } from "@/lib/utils";
 
 interface JournalSidebarProps {
@@ -43,6 +45,7 @@ export function JournalSidebar({
 	onCreateJournal,
 }: JournalSidebarProps) {
 	const { t } = useTranslation("journal");
+	const { weekStart } = useWeekStart();
 
 	const datesWithEntries = new Set(
 		calendarDays.filter((d) => d.hasEntry).map((d) => d.date),
@@ -61,6 +64,25 @@ export function JournalSidebar({
 	function handleMonthChange(month: Date) {
 		onMonthChange(month.getFullYear(), month.getMonth() + 1);
 	}
+
+	// Create formatters for translated calendar
+	const formatters = {
+		formatMonthDropdown: (date: Date) => {
+			const month = date.getMonth();
+			return t(`calendar.monthsShort.${month}`);
+		},
+		formatCaption: (date: Date) => {
+			const month = t(`calendar.months.${date.getMonth()}`);
+			return `${month} ${date.getFullYear()}`;
+		},
+		formatWeekdayName: (date: Date) => {
+			const dayIndex = date.getDay();
+			return t(`calendar.weekDaysShort.${dayIndex}`);
+		},
+		formatYearDropdown: (date: Date) => {
+			return date.getFullYear().toString();
+		},
+	};
 
 	return (
 		<Sidebar className="border-r border-border/40 bg-sidebar">
@@ -94,6 +116,10 @@ export function JournalSidebar({
 									return datesWithEntries.has(`${y}-${m}-${d}`);
 								},
 							}}
+							animate={true}
+							weekStartsOn={weekStart}
+							captionLayout="dropdown"
+							formatters={formatters}
 							modifiersClassNames={{
 								hasEntry: "relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-primary font-medium text-primary",
 							}}
@@ -119,7 +145,7 @@ export function JournalSidebar({
 					<SidebarGroupContent className="mt-2 space-y-1">
 						<SidebarMenu>
 							{journals.map((journal) => (
-								<SidebarMenuItem key={journal.id}>
+								<SidebarMenuItem className="flex items-center" key={journal.id}>
 									<SidebarMenuButton
 										isActive={journal.id === activeJournalId}
 										onClick={() => onOpenJournal(journal.id)}
@@ -130,36 +156,36 @@ export function JournalSidebar({
 												: "hover:bg-muted/60 text-sidebar-foreground group"
 										)}
 									>
-										<BookText className={cn("size-4 shrink-0 transition-colors", journal.id === activeJournalId ? "text-primary-foreground/80" : "text-muted-foreground group-hover:text-primary")} />
+										<BookText className={cn("size-4 shrink-0 transition-colors", journal.id === activeJournalId ? "" : "text-muted-foreground group-hover:text-primary")} />
 										<span className="flex-1 truncate">{journal.name}</span>
-										{journal.privacy === "private" && (
-											<button
-												onClick={(e) => {
-													e.stopPropagation();
-													if (!journal.isLocked) {
-														onLockJournal(journal.id);
-													}
-												}}
-												className={cn(
-													"shrink-0 rounded-md p-1 transition-colors",
-													journal.id === activeJournalId 
-														? "hover:bg-primary-foreground/20 text-primary-foreground/80"
-														: "hover:bg-muted-foreground/20 text-muted-foreground"
-												)}
-												title={
-													journal.isLocked
-														? t("journal.locked")
-														: t("journal.lock")
-												}
-											>
-												{journal.isLocked ? (
-													<Lock className="size-3.5" />
-												) : (
-													<Unlock className="size-3.5" />
-												)}
-											</button>
-										)}
 									</SidebarMenuButton>
+									{journal.privacy === "private" && (
+										<SidebarMenuAction
+											showOnHover
+											onClick={(e) => {
+												e.stopPropagation();
+												if (!journal.isLocked) {
+													onLockJournal(journal.id);
+												}
+											}}
+											className={cn("top-[50%]! translate-y-[-50%]",
+												journal.id === activeJournalId
+													? "hover:bg-primary-foreground/20 text-primary-foreground/80"
+													: "hover:bg-muted-foreground/20 text-muted-foreground"
+											)}
+											title={
+												journal.isLocked
+													? t("journal.locked")
+													: t("journal.lock")
+											}
+										>
+											{journal.isLocked ? (
+												<Lock className="size-3.5" />
+											) : (
+												<Unlock className="size-3.5" />
+											)}
+										</SidebarMenuAction>
+									)}
 								</SidebarMenuItem>
 							))}
 						</SidebarMenu>

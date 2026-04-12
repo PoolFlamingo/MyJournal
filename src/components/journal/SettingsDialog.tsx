@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { useTheme } from "@/components/theme-provider";
 import { useLanguage } from "@/components/language-provider";
 import { useThemePreset } from "@/hooks/useThemePreset";
+import { useWeekStart } from "@/hooks/useWeekStart";
 import {
 	Select,
 	SelectContent,
@@ -32,6 +33,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 	const { theme, setTheme } = useTheme();
 	const { language, setLanguage, supportedLanguages } = useLanguage();
 	const { loadTheme, getSavedPreset, availablePresets, getDisplayName } = useThemePreset();
+	const { weekStart, setWeekStart } = useWeekStart();
 	const [selectedTheme, setSelectedTheme] = useState<string | undefined>(() => {
 		const saved = getSavedPreset();
 		return saved ?? "caffeine";
@@ -112,6 +114,25 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 										</button>
 									))}
 								</div>
+							</div>
+
+							{/* Week Start */}
+							<div className="border-t border-border/40 pt-4">
+								<Label htmlFor="week-start-select" className="text-base font-semibold mb-3 block">
+									{t("journal:settings.weekStart", "Inicio de la semana")}
+								</Label>
+								<Select value={weekStart.toString()} onValueChange={(value) => setWeekStart(value === "0" ? 0 : 1)}>
+									<SelectTrigger id="week-start-select">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										<SelectItem value="0">{t("journal:settings.weekStartSunday", "Domingo")}</SelectItem>
+										<SelectItem value="1">{t("journal:settings.weekStartMonday", "Lunes")}</SelectItem>
+									</SelectContent>
+								</Select>
+								<p className="text-sm text-muted-foreground mt-2">
+									{t("journal:settings.weekStartDescription", "Elige si la semana comienza el domingo o el lunes.")}
+								</p>
 							</div>
 						</div>
 					</TabsContent>
