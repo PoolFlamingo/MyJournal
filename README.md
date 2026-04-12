@@ -1,186 +1,197 @@
-# Tauract
+# My Journal
 
-Plantilla base para aplicaciones de escritorio con **Tauri v2 + React 19 + TypeScript**, lista para escalar. Incluye un ejemplo completo de lista de tareas (TODO) con base de datos SQLite persistente gestionada por un **sidecar Bun + Drizzle ORM**.
+Spanish version: [README.es.md](README.es.md)
 
-## Stack tecnológico
+My Journal is a desktop journaling application designed for writing, organizing, and protecting personal entries in a local, privacy-focused environment. The project uses Tauri v2 for desktop packaging, React 19 for the interface, and a Bun sidecar to manage SQLite and domain workflows.
 
-| Capa | Tecnología |
+This repository is no longer a generic TODO example. The real product is centered on journals, date-based entries, privacy, visual customization, and an architecture prepared to evolve toward real encryption, import/export, and file integrity workflows.
+
+## What My Journal Offers
+
+- Multiple journals, with only one active journal at a time.
+- Calendar-based navigation for writing or revisiting entries on any day.
+- A rich Tiptap editor with formatting, lists, tasks, links, images, tables, code blocks, and highlighting.
+- Public and private journals, with an unlock flow for private ones.
+- Local persistence: metadata is indexed in SQLite while each entry body is stored as a `.myj` file.
+- Bilingual interface in Spanish and English.
+- Theme support with light, dark, or system mode plus curated presets.
+- Configurable first day of the week in the calendar.
+
+## User Experience
+
+The app starts by trying to reopen the last journal used. If no journal exists yet, it shows a welcome screen where the user can create the first one. From there, the user can:
+
+1. Create a public or private journal.
+2. Pick a date from the left sidebar calendar.
+3. Write a rich-text entry in the central editor.
+4. Save, edit, or delete the entry for that date.
+5. Change language, theme, and visual preferences from settings.
+
+The current interface already includes a calendar sidebar, journal list, desktop-style top menu, unlock screen for private journals, and an editor ready for daily writing.
+
+## Current Project Status
+
+My Journal is in an early functional stage: the product foundation already exists and can be used to create journals, write entries, and manage them by date, but part of the roadmap is still in progress.
+
+### Implemented Today
+
+- Welcome flow and reopening of the last used journal.
+- Journal creation with name, description, privacy, and required-title rule.
+- Lock and unlock flow for private journals during the current session.
+- Entry storage by date in `.myj` files.
+- SQLite index for journals, entries, app settings, and the base schema for tags.
+- SHA-256 hash of each entry body to support future integrity checks.
+- Theme presets, language selector, and calendar preference support.
+
+### Planned Or Still Evolving
+
+- Final encryption model for private journals and `.myj` files.
+- Secure password hashing and password rotation without risking access to content.
+- `.zip` import/export with integrity verification.
+- Complete tag workflow and more advanced organization features.
+- Sharing and more advanced privacy-related capabilities.
+
+### Important Privacy Note
+
+The base private-journal flow is already implemented, but the final encryption model described in [MY_JOURNAL_ROADMAP.md](MY_JOURNAL_ROADMAP.md) is not complete yet. Right now the project provides application-level access control and locking, not the final cryptographic model planned in the roadmap.
+
+## How Data Is Stored
+
+My Journal separates content from indexing so the app stays lightweight and can grow without turning SQLite into a large content store:
+
+- SQLite stores journal metadata, entry metadata, and global settings.
+- Each entry is stored as a `.myj` file inside the selected journal directory.
+- The database keeps the date, title, relative file path, and a content hash.
+
+In practice, SQLite acts as the index while the actual writing lives in user files, matching the architecture described in the roadmap.
+
+## Architecture
+
+```text
+React UI
+     -> typed hooks and services
+     -> SidecarService (@tauri-apps/plugin-shell)
+     -> JSON Lines over stdin/stdout
+     -> compiled Bun sidecar
+     -> SQLite for indexes and metadata
+     -> .myj files for entry content
+
+Tauri (Rust)
+     -> desktop packaging
+     -> native plugins (shell, store, os, opener)
+```
+
+### Layer Responsibilities
+
+| Layer | Main responsibility |
+|---|---|
+| `src/` | Interface, hooks, i18n, themes, and frontend services |
+| `sidecar/` | Persistence, IPC routing, SQLite, journal files, and domain logic |
+| `src-tauri/` | Native Tauri host, plugins, and desktop packaging |
+
+## Repository Structure
+
+```text
+my-journal/
+|- src/                    React frontend and product UI
+|- sidecar/                Bun sidecar with SQLite, handlers, and IPC types
+|- src-tauri/              Rust Tauri host and desktop configuration
+|- sidecar-drizzle/        Generated SQL migrations
+|- scripts/                Sidecar build scripts
+|- public/                 Static assets
+|- MY_JOURNAL_ROADMAP.md   Product direction and functional vision
+```
+
+## Technology Stack
+
+| Layer | Technology |
 |---|---|
 | UI | React 19 + TypeScript + Vite 7 |
-| Backend de escritorio | Tauri v2 (Rust) |
-| Base de datos | SQLite vía sidecar Bun |
+| Editor | Tiptap |
+| Desktop host | Tauri v2 |
+| Persistence | SQLite via Bun sidecar |
 | ORM | Drizzle ORM (`bun:sqlite`) |
-| IPC frontend ↔ DB | JSON Lines sobre stdin/stdout |
-| Calidad de código | ESLint 9 (flat config) + Prettier |
+| IPC | JSON Lines over stdin/stdout |
+| Internationalization | i18next |
+| Themes | next-themes + JSON presets |
+| Code quality | ESLint 9 + Prettier + TypeScript |
 
-## Arquitectura
+## Prerequisites
 
-```
-React (UI)
-  └─ SidecarService (@tauri-apps/plugin-shell)
-       └─ JSON Lines IPC (stdin / stdout)
-            └─ Sidecar Bun (binario compilado ~60 MB)
-                 └─ Drizzle ORM + bun:sqlite → todos.db
-```
+- Node.js 18 or newer.
+- Rust and cargo.
+- Bun 1.2 or newer to compile the sidecar.
+- The usual Tauri system dependencies for your operating system.
 
-El sidecar es un **binario TypeScript compilado con `bun build --compile`** que se distribuye junto a la app. Gestiona toda la lógica de base de datos y expone un protocolo RPC sencillo. El frontend nunca toca SQL directamente.
+On Windows, Bun can be installed with:
 
-## Estructura del proyecto
-
-```
-tauract/
-├── src/                          # Frontend React
-│   ├── components/
-│   │   ├── todo/                 # TodoList, TodoItem, TodoForm, TodoFilters
-│   │   └── ui/                   # Button, Input, Modal (componentes reutilizables)
-│   ├── hooks/
-│   │   └── useTodos.ts           # Hook principal de estado y CRUD
-│   ├── services/
-│   │   ├── sidecar.ts            # Gestión del ciclo de vida del sidecar + IPC
-│   │   └── todoApi.ts            # API tipada de TODOs
-│   ├── types/
-│   │   └── todo.ts               # Interfaces Todo, CreateTodoDto, UpdateTodoDto
-│   ├── App.tsx
-│   └── App.css
-├── sidecar/                      # Código fuente del sidecar (Bun + TypeScript)
-│   ├── main.ts                   # Entry point: bucle de lectura stdin
-│   ├── db/
-│   │   ├── schema.ts             # Esquema Drizzle (tabla todos)
-│   │   ├── index.ts              # Conexión SQLite + PRAGMAs
-│   │   └── migrate.ts            # Migraciones DDL idempotentes al arranque
-│   ├── handlers/
-│   │   ├── todos.ts              # CRUD handlers con Drizzle
-│   │   └── index.ts              # Router de métodos IPC
-│   ├── types/
-│   │   └── ipc.ts                # Tipos del protocolo JSON Lines
-│   └── drizzle.config.ts         # Config de drizzle-kit (dev)
-├── src-tauri/                    # Backend Rust (Tauri)
-│   ├── src/
-│   │   ├── lib.rs                # Comandos Tauri + registro de plugins
-│   │   └── main.rs               # Punto de entrada del binario
-│   ├── binaries/                 # Binario compilado del sidecar (generado)
-│   ├── capabilities/
-│   │   └── default.json          # Permisos: shell:spawn, shell:stdin-write, shell:kill
-│   └── tauri.conf.json
-├── sidecar-drizzle/              # Migraciones SQL generadas (committear)
-├── scripts/
-│   └── build-sidecar.mjs         # Script de compilación del sidecar
-├── eslint.config.js
-└── .prettierrc
-```
-
-## Requisitos previos
-
-- [Node.js](https://nodejs.org/) >= 18
-- [Rust + cargo](https://rustup.rs/)
-- [Tauri CLI v2](https://v2.tauri.app/start/) (instalado como devDependency)
-- [Bun](https://bun.sh/) >= 1.2 — necesario para compilar el sidecar
-
-**Instalar Bun en Windows:**
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm bun.sh/install.ps1 | iex"
 ```
 
-## Comandos
-
-### Desarrollo
+## Main Commands
 
 ```bash
-# Instalar dependencias npm
+# Install dependencies
 npm install
 
-# Compilar el sidecar (necesario la primera vez y tras cambios en sidecar/)
+# Start only the web UI in development
+npm run dev
+
+# Compile the sidecar manually
 npm run build:sidecar
 
-# Arrancar la app en modo desarrollo (compilar sidecar + Vite + Tauri)
-npm run tauri dev
-```
+# Run the full desktop app in development
+npm run tauri:dev
 
-> `npm run tauri dev` ejecuta automáticamente `build:sidecar` antes de arrancar.
+# Frontend type-check
+npx tsc --noEmit
 
-### Build de producción
+# Lint
+npm run lint
 
-```bash
+# Check formatting
+npm run format:check
+
+# Production desktop build
 npm run tauri build
 ```
 
-Genera el instalador en `src-tauri/target/release/bundle/`.
+## Main IPC Methods
 
-### Herramientas de código
+The frontend communicates with the sidecar through JSON Lines requests. These are the most relevant methods in the current journal domain:
 
-```bash
-# Comprobar errores de TypeScript
-npx tsc --noEmit
+| Method | Description |
+|---|---|
+| `app.bootstrap` | Loads available journals and the last used journal |
+| `journal.list` | Lists all journals |
+| `journal.create` | Creates a new journal |
+| `journal.open` | Opens the active journal |
+| `journal.unlock` | Unlocks a private journal |
+| `journal.lock` | Locks a private journal for the current session |
+| `entry.getByDate` | Gets the entry for a specific date |
+| `entry.save` | Saves or updates an entry |
+| `entry.delete` | Deletes an entry |
+| `entry.listMonth` | Marks which calendar days have an entry |
 
-# Linter
-npm run lint
+## Product Direction
 
-# Formatear código
-npm run format
+The functional reference for the project is [MY_JOURNAL_ROADMAP.md](MY_JOURNAL_ROADMAP.md). If you find leftover TODO-example code, treat it as transition scaffolding rather than the product target. The real direction of My Journal is:
 
-# Comprobar formato sin modificar
-npm run format:check
-```
+- journal-first, not task-first;
+- file-based entry content instead of large SQLite blobs;
+- strong privacy for private journals;
+- import, export, and integrity validation;
+- a desktop writing experience designed for continuity and reflection.
 
-### Base de datos (desarrollo)
+## Development Notes
 
-```bash
-# Generar nuevas migraciones SQL tras modificar sidecar/db/schema.ts
-npm run build:migrations
+If you are extending the app, these are the most relevant entry points:
 
-# Ver la DB en el navegador (Drizzle Studio)
-npx drizzle-kit studio --config=sidecar/drizzle.config.ts
-```
+- `src/hooks/useJournal.ts`: main application-state orchestration.
+- `src/services/journalApi.ts`: typed frontend API for the sidecar.
+- `sidecar/handlers/journals.ts`: journal operations and bootstrap.
+- `sidecar/handlers/entries.ts`: entry storage and `.myj` file access.
+- `sidecar/db/schema.ts`: SQLite domain schema.
 
-## Protocolo IPC (sidecar)
-
-El frontend se comunica con el sidecar mediante **JSON Lines** sobre stdin/stdout. Cada mensaje es un JSON en una sola línea.
-
-**Request:**
-```json
-{ "id": "req_1", "method": "todo.create", "params": { "title": "Mi tarea" } }
-```
-
-**Response:**
-```json
-{ "id": "req_1", "result": { "id": 1, "title": "Mi tarea", "completed": false, ... } }
-```
-
-**Métodos disponibles:**
-
-| Método | Params | Descripción |
-|---|---|---|
-| `todo.list` | `{ completed?, search? }` | Listar todos (con filtros opcionales) |
-| `todo.get` | `{ id }` | Obtener uno por ID |
-| `todo.create` | `{ title, description? }` | Crear nuevo TODO |
-| `todo.update` | `{ id, title?, description?, completed? }` | Actualizar campos |
-| `todo.delete` | `{ id }` | Eliminar por ID |
-| `ping` | — | Health check |
-
-## Añadir una nueva tabla (escalado)
-
-1. Definir la tabla en `sidecar/db/schema.ts` con `sqliteTable`
-2. Añadir el `CREATE TABLE IF NOT EXISTS` correspondiente en `sidecar/db/migrate.ts`
-3. Crear handlers en `sidecar/handlers/miTabla.ts`
-4. Registrar los métodos en `sidecar/handlers/index.ts`
-5. Añadir los tipos IPC en `sidecar/types/ipc.ts`
-6. Crear el servicio API en `src/services/miTablaApi.ts`
-7. Ejecutar `npm run build:sidecar` para recompilar
-
-## Añadir un nuevo comando Tauri (Rust)
-
-1. Definir la función en `src-tauri/src/lib.rs`:
-   ```rust
-   #[tauri::command]
-   fn mi_comando(arg: String) -> Result<String, String> { ... }
-   ```
-2. Registrarlo en `.invoke_handler(tauri::generate_handler![greet, mi_comando])`
-3. Llamarlo desde React: `await invoke("mi_comando", { arg: "valor" })`
-
-## IDE recomendado
-
-[VS Code](https://code.visualstudio.com/) con las siguientes extensiones:
-
-- [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode)
-- [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
-- [Bun for Visual Studio Code](https://marketplace.visualstudio.com/items?itemName=oven.bun-vscode)
+The repository still keeps the legacy TODO module for migration safety, but it should not drive new product decisions.
