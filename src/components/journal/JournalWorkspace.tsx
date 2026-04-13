@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -309,9 +310,8 @@ export function JournalWorkspace({
 							<div className="grid gap-3 rounded-md border border-border/60 bg-muted/30 p-3">
 								<div className="space-y-2">
 									<Label htmlFor="workspace-journal-password">{t("journal.password")}</Label>
-									<Input
+									<PasswordInput
 										id="workspace-journal-password"
-										type="password"
 										placeholder={t("journal.passwordPlaceholder")}
 										value={password}
 										onChange={(event) => setPassword(event.target.value)}
@@ -319,9 +319,8 @@ export function JournalWorkspace({
 								</div>
 								<div className="space-y-2">
 									<Label htmlFor="workspace-journal-confirm">{t("journal.confirmPassword")}</Label>
-									<Input
+									<PasswordInput
 										id="workspace-journal-confirm"
-										type="password"
 										placeholder={t("journal.passwordPlaceholder")}
 										value={confirmPassword}
 										onChange={(event) => setConfirmPassword(event.target.value)}

@@ -182,6 +182,10 @@
 }
 
 @layer base {
+  /* Suppress the native WebView2/Edge password reveal button */
+  input[type="password"]::-ms-reveal {
+    display: none;
+  }
   * {
     @apply border-border;
   }

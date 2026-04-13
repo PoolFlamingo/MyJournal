@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -226,9 +227,8 @@ export function WelcomeScreen({
 								</p>
 								<div className="space-y-2">
 									<Label htmlFor="journal-password">{t("journal.password")}</Label>
-									<Input
+									<PasswordInput
 										id="journal-password"
-										type="password"
 										className="h-11 border-border/50 bg-background"
 										placeholder={t("journal.passwordPlaceholder")}
 										value={password}
@@ -237,9 +237,8 @@ export function WelcomeScreen({
 								</div>
 								<div className="space-y-2">
 									<Label htmlFor="journal-confirm-password">{t("journal.confirmPassword")}</Label>
-									<Input
+									<PasswordInput
 										id="journal-confirm-password"
-										type="password"
 										className="h-11 border-border/50 bg-background"
 										placeholder={t("journal.passwordPlaceholder")}
 										value={confirmPassword}

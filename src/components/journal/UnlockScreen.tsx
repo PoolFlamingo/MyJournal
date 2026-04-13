@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -94,10 +94,9 @@ export function UnlockScreen({ journal, onUnlock, onBack }: UnlockScreenProps) {
 										{t("unlock.passwordLabel", "Contraseña")}
 									</Label>
 									<div className="relative">
-										<KeyRound className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60" />
-										<Input
-											id="unlock-password"
-											type="password"
+									<KeyRound className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground/60 z-10" />
+									<PasswordInput
+										id="unlock-password"
 											placeholder={t("unlock.passwordPlaceholder")}
 											value={password}
 											onChange={(e) => setPassword(e.target.value)}
