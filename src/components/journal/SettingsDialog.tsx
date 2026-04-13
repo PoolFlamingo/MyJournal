@@ -171,13 +171,13 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 								</p>
 								<div className="space-y-1 text-xs text-muted-foreground">
 									<p>
-										<span className="font-medium text-foreground">Versión:</span> 0.1.0
+										<span className="font-medium text-foreground">{t("journal:menu.versionLabel")}:</span> 0.1.0
 									</p>
 									<p>
-										<span className="font-medium text-foreground">Tecnología:</span> Tauri + React + TypeScript
+										<span className="font-medium text-foreground">{t("journal:menu.technologyLabel")}:</span> Tauri + React + TypeScript
 									</p>
 									<p>
-										<span className="font-medium text-foreground">Sidecar:</span> Bun + SQLite
+										<span className="font-medium text-foreground">{t("journal:menu.sidecarLabel")}:</span> Bun + SQLite
 									</p>
 								</div>
 							</div>

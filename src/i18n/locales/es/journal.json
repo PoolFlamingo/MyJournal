@@ -5,13 +5,16 @@
 		"createNew": "Crear nuevo diario",
 		"openExisting": "Abrir diario existente",
 		"importJournal": "Importar diario",
-		"noJournals": "Aún no tienes ningún diario. Crea uno para empezar."
+		"noJournals": "Aún no tienes ningún diario. Crea uno para empezar.",
+		"noJournalsTitle": "Ningún diario",
+		"createDialogDescription": "Configura el nombre y la privacidad de tu nuevo espacio personal."
 	},
 	"sidebar": {
 		"journals": "Diarios",
 		"calendar": "Calendario",
 		"newJournal": "Nuevo diario",
-		"settings": "Ajustes"
+		"settings": "Ajustes",
+		"workspace": "Espacio de trabajo"
 	},
 	"journal": {
 		"name": "Nombre del diario",
@@ -36,7 +39,9 @@
 		"open": "Abrir",
 		"entries_one": "{{count}} entrada",
 		"entries_other": "{{count}} entradas",
-		"noEntries": "Sin entradas"
+		"noEntries": "Sin entradas",
+		"optional": "(Opcional)",
+		"passwordWarning": "La contraseña cifrará permanentemente tu diario. Si la olvidas, perderás el acceso a tus entradas."
 	},
 	"unlock": {
 		"title": "Diario privado",
@@ -45,7 +50,8 @@
 		"passwordPlaceholder": "Introduce la contraseña",
 		"submit": "Desbloquear",
 		"invalidPassword": "Contraseña incorrecta",
-		"noRecovery": "Si olvidaste la contraseña, no es posible recuperar el contenido."
+		"noRecovery": "Si olvidaste la contraseña, no es posible recuperar el contenido.",
+		"privacyRequired": "Privacidad requerida"
 	},
 	"entry": {
 		"title": "Título de la entrada",
@@ -140,7 +146,10 @@
 		"feature4": "Navegación por calendario",
 		"feature5": "Temas personalizables",
 		"cancel": "Cancelar",
-		"creating": "Creando..."
+		"creating": "Creando...",
+		"versionLabel": "Versión",
+		"technologyLabel": "Tecnología",
+		"sidecarLabel": "Motor"
 	},
 	"calendar": {
 		"today": "Hoy",

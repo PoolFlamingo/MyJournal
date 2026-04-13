@@ -78,7 +78,7 @@ export function UnlockScreen({ journal, onUnlock, onBack }: UnlockScreenProps) {
 						<div className="relative">
 							<div className="absolute inset-x-0 -top-3 flex justify-center">
 								<span className="bg-card px-2 text-xs text-muted-foreground border border-border/50 rounded-full">
-									Privacidad requerida
+									{t("unlock.privacyRequired")}
 								</span>
 							</div>
 							<div className="space-y-4 rounded-xl bg-muted/30 p-5 pt-7 border border-border/30">

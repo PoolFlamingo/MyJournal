@@ -150,8 +150,8 @@ export function WelcomeScreen({
 					) : (
 						<div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 bg-muted/20 p-8 text-center backdrop-blur-sm">
 							<Book className="mb-3 size-10 text-muted-foreground/50" />
-							<h3 className="text-lg font-medium text-foreground">Ningún diario</h3>
-							<p className="mt-1 text-sm text-muted-foreground">Comienza creando tu primer diario personal.</p>
+						<h3 className="text-lg font-medium text-foreground">{t("welcome.noJournalsTitle")}</h3>
+						<p className="mt-1 text-sm text-muted-foreground">{t("welcome.noJournals")}</p>
 						</div>
 					)}
 				</div>
@@ -162,7 +162,7 @@ export function WelcomeScreen({
 					<DialogHeader>
 						<DialogTitle className="text-2xl">{t("welcome.createNew", "Crear nuevo diario")}</DialogTitle>
 						<DialogDescription>
-							Configura el nombre y la privacidad de tu nuevo espacio personal.
+						{t("welcome.createDialogDescription")}
 						</DialogDescription>
 					</DialogHeader>
 					<div className="flex flex-col gap-6 py-4">
@@ -180,7 +180,7 @@ export function WelcomeScreen({
 							</div>
 							<div className="space-y-2">
 								<Label htmlFor="journal-description" className="text-sm font-semibold">
-									{t("journal.description")} <span className="text-muted-foreground font-normal">(Opcional)</span>
+								{t("journal.description")} <span className="text-muted-foreground font-normal">{t("journal.optional")}</span>
 								</Label>
 								<Textarea
 									id="journal-description"
@@ -222,7 +222,7 @@ export function WelcomeScreen({
 							<div className="animate-in fade-in slide-in-from-top-2 space-y-4 rounded-lg bg-muted/50 p-4 border border-border/50">
 								<p className="text-xs text-muted-foreground mb-2 flex items-center gap-1.5 leading-relaxed">
 									<Lock className="size-3.5" />
-									La contraseña cifrará permanentemente tu diario. Si la olvidas, perderás el acceso a tus entradas.
+									{t("journal.passwordWarning")}
 								</p>
 								<div className="space-y-2">
 									<Label htmlFor="journal-password">{t("journal.password")}</Label>
@@ -271,7 +271,7 @@ export function WelcomeScreen({
 					</div>
 					<DialogFooter className="gap-2 sm:gap-0">
 						<Button variant="ghost" onClick={() => setShowCreateDialog(false)}>
-							Cancelar
+						{t("menu.cancel")}
 						</Button>
 						<Button
 							className="h-10 px-6"
@@ -283,7 +283,7 @@ export function WelcomeScreen({
 									(!password || password !== confirmPassword))
 							}
 						>
-							{creating ? "Creando..." : t("welcome.createNew", "Crear diario")}
+							{creating ? t("menu.creating") : t("welcome.createNew")}
 						</Button>
 					</DialogFooter>
 				</DialogContent>

@@ -247,7 +247,7 @@ export function JournalWorkspace({
 						<h2 className="text-sm font-semibold tracking-tight">{activeJournal.name}</h2>
 						{activeJournal.privacy === "private" && (
 							<span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-primary">
-								Privado
+								{t("journal.private")}
 							</span>
 						)}
 					</div>

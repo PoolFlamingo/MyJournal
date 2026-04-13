@@ -92,7 +92,7 @@ export function JournalSidebar({
 				</div>
 				<div className="flex flex-col gap-0.5 leading-none">
 					<span className="font-bold tracking-tight text-sidebar-foreground">My Journal</span>
-					<span className="text-[10px] text-muted-foreground uppercase tracking-widest">Workspace</span>
+				<span className="text-[10px] text-muted-foreground uppercase tracking-widest">{t("sidebar.workspace")}</span>
 				</div>
 			</SidebarHeader>
 

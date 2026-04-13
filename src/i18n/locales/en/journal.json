@@ -5,13 +5,16 @@
 		"createNew": "Create new journal",
 		"openExisting": "Open existing journal",
 		"importJournal": "Import journal",
-		"noJournals": "You don't have any journals yet. Create one to get started."
+		"noJournals": "You don't have any journals yet. Create one to get started.",
+		"noJournalsTitle": "No journals yet",
+		"createDialogDescription": "Set up the name and privacy of your new personal space."
 	},
 	"sidebar": {
 		"journals": "Journals",
 		"calendar": "Calendar",
 		"newJournal": "New journal",
-		"settings": "Settings"
+		"settings": "Settings",
+		"workspace": "Workspace"
 	},
 	"journal": {
 		"name": "Journal name",
@@ -36,7 +39,9 @@
 		"open": "Open",
 		"entries_one": "{{count}} entry",
 		"entries_other": "{{count}} entries",
-		"noEntries": "No entries"
+		"noEntries": "No entries",
+		"optional": "(Optional)",
+		"passwordWarning": "The password will permanently encrypt your journal. If you forget it, you will lose access to your entries."
 	},
 	"unlock": {
 		"title": "Private journal",
@@ -45,7 +50,8 @@
 		"passwordPlaceholder": "Enter password",
 		"submit": "Unlock",
 		"invalidPassword": "Incorrect password",
-		"noRecovery": "If you forgot your password, it is not possible to recover the content."
+		"noRecovery": "If you forgot your password, it is not possible to recover the content.",
+		"privacyRequired": "Privacy required"
 	},
 	"entry": {
 		"title": "Entry title",
@@ -140,7 +146,10 @@
 		"feature4": "Calendar navigation",
 		"feature5": "Customizable themes",
 		"cancel": "Cancel",
-		"creating": "Creating..."
+		"creating": "Creating...",
+		"versionLabel": "Version",
+		"technologyLabel": "Technology",
+		"sidecarLabel": "Engine"
 	},
 	"calendar": {
 		"today": "Today",

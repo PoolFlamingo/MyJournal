@@ -58,7 +58,7 @@ If current scaffold code and roadmap differ, preserve working behavior but steer
 - Follow `.editorconfig`: the project uses tabs, with width 2 for `tsx`, `json`, `css`, and `html`.
 - Use functional React components and hooks. Do not introduce class components.
 - Prefer the `@/` alias inside `src/` when practical.
-- Put user-facing text in i18n resources. When adding UI copy, update both Spanish and English locales.
+- **Every user-facing string must go through the `t()` function from `useTranslation`.** Never write raw text literals inside JSX elements (`<p>`, `<span>`, `<h1>`, `<Button>`, `<Label>`, `<DialogDescription>`, etc.) or as string props (`placeholder`, `title`, `aria-label`). This includes labels, descriptions, tooltips, button copy, error messages, status badges, and fallback states. Add the key to both `src/i18n/locales/es/*.json` and `src/i18n/locales/en/*.json` before wiring it in the component. When in doubt, group the key under the closest existing namespace section (e.g. `welcome`, `journal`, `sidebar`, `menu`, `unlock`, `entry`).
 - Keep theme work aligned with `src/assets/themes/*.json` and the existing token format.
 - Maintain strict TypeScript compatibility and avoid unused symbols.
 - The Rust library crate name `tauract_lib` must remain unchanged.
