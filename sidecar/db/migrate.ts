@@ -31,18 +31,26 @@ export function runMigrations(): void {
     // v2 — journal domain
     sqlite.run(`
       CREATE TABLE IF NOT EXISTS journals (
-        id             TEXT PRIMARY KEY NOT NULL,
-        name           TEXT NOT NULL,
-        description    TEXT,
-        privacy        TEXT NOT NULL DEFAULT 'public',
-        password_hash  TEXT,
-        wrapped_key    TEXT,
-        key_salt       TEXT,
-        storage_path   TEXT NOT NULL,
-        created_at     INTEGER NOT NULL,
-        updated_at     INTEGER NOT NULL
+        id              TEXT PRIMARY KEY NOT NULL,
+        name            TEXT NOT NULL,
+        description     TEXT,
+        privacy         TEXT NOT NULL DEFAULT 'public',
+        password_hash   TEXT,
+        wrapped_key     TEXT,
+        key_salt        TEXT,
+        title_required  INTEGER NOT NULL DEFAULT 1,
+        storage_path    TEXT NOT NULL,
+        created_at      INTEGER NOT NULL,
+        updated_at      INTEGER NOT NULL
       );
     `);
+
+    // v2.1 — add title_required to existing journals tables missing the column
+    try {
+      sqlite.run(`ALTER TABLE journals ADD COLUMN title_required INTEGER NOT NULL DEFAULT 1;`);
+    } catch {
+      // Column already exists — ignore
+    }
 
     sqlite.run(`
       CREATE TABLE IF NOT EXISTS entries (

@@ -29,6 +29,7 @@ export interface UseJournalReturn {
 	// Journal requiring unlock
 	pendingUnlockJournal: JournalSummary | null;
 	// Actions
+	cancelUnlock: () => void;
 	createJournal: (data: CreateJournalDto) => Promise<void>;
 	openJournal: (id: string) => Promise<void>;
 	deleteJournal: (id: string) => Promise<void>;
@@ -358,6 +359,11 @@ export function useJournal(): UseJournalReturn {
 
 	const dismissError = useCallback(() => setError(null), []);
 
+	const cancelUnlock = useCallback(() => {
+		setPendingUnlockJournal(null);
+		setView(journals.length > 0 ? "welcome" : "welcome");
+	}, [journals]);
+
 	return {
 		view,
 		loading,
@@ -369,6 +375,7 @@ export function useJournal(): UseJournalReturn {
 		currentEntry,
 		entryLoading,
 		pendingUnlockJournal,
+		cancelUnlock,
 		createJournal: createJournalAction,
 		openJournal: openJournalAction,
 		deleteJournal: deleteJournalAction,

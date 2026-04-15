@@ -62,6 +62,7 @@ interface JournalWorkspaceProps {
 	onOpenJournal: (id: string) => Promise<void>;
 	onLockJournal: (id: string) => Promise<void>;
 	onRequestCreateJournal: (data: CreateJournalDto) => Promise<void>;
+	onDeleteJournal: (id: string) => Promise<void>;
 	onSaveEntry: (data: SaveEntryDto) => Promise<void>;
 	onDeleteEntry: (date: string) => Promise<void>;
 }
@@ -78,6 +79,7 @@ export function JournalWorkspace({
 	onOpenJournal,
 	onLockJournal,
 	onRequestCreateJournal,
+	onDeleteJournal,
 	onSaveEntry,
 	onDeleteEntry,
 }: JournalWorkspaceProps) {
@@ -136,6 +138,7 @@ export function JournalWorkspace({
 				onMonthChange={onMonthChange}
 				onOpenJournal={(id) => onOpenJournal(id)}
 				onLockJournal={(id) => onLockJournal(id)}
+				onDeleteJournal={(id) => onDeleteJournal(id)}
 				onCreateJournal={() => setShowCreateDialog(true)}
 			/>
 			<SidebarInset className="bg-background flex flex-col h-screen overflow-hidden">

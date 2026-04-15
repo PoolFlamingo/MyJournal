@@ -11,7 +11,7 @@ import type {
   JournalDetails,
   BootstrapResult,
 } from "../types/journal";
-import { existsSync, mkdirSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
 /**
@@ -188,8 +188,17 @@ export async function deleteJournal(params: DeleteJournalParams): Promise<void> 
 
   // TODO: Phase 4 — verify password for private journals before deletion
 
+  // Delete all entries from DB (cascade should handle it, but be explicit)
+  db.delete(entries).where(eq(entries.journalId, params.id)).run();
+
+  // Delete journal record
   db.delete(journals).where(eq(journals.id, params.id)).run();
   unlockedJournals.delete(params.id);
+
+  // Delete journal storage directory and all files
+  if (journal.storagePath && existsSync(journal.storagePath)) {
+    rmSync(journal.storagePath, { recursive: true, force: true });
+  }
 
   // If this was the last opened journal, clear the setting
   const lastSetting = db

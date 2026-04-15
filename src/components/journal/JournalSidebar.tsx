@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -16,10 +17,20 @@ import {
 } from "@/components/ui/sidebar";
 import { LanguageSwitch } from "@/components/language-switch";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { BookText, Plus, Lock, Unlock, LayoutDashboard } from "lucide-react";
+import { BookText, Plus, Lock, Unlock, LayoutDashboard, Trash2 } from "lucide-react";
 import type { JournalSummary, CalendarDayState } from "@/types/journal";
 import { useWeekStart } from "@/hooks/useWeekStart";
 import { cn } from "@/lib/utils";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface JournalSidebarProps {
 	journals: JournalSummary[];
@@ -30,6 +41,7 @@ interface JournalSidebarProps {
 	onMonthChange: (year: number, month: number) => void;
 	onOpenJournal: (id: string) => void;
 	onLockJournal: (id: string) => void;
+	onDeleteJournal: (id: string) => void;
 	onCreateJournal: () => void;
 }
 
@@ -42,10 +54,12 @@ export function JournalSidebar({
 	onMonthChange,
 	onOpenJournal,
 	onLockJournal,
+	onDeleteJournal,
 	onCreateJournal,
 }: JournalSidebarProps) {
 	const { t } = useTranslation("journal");
 	const { weekStart } = useWeekStart();
+	const [journalToDelete, setJournalToDelete] = useState<JournalSummary | null>(null);
 
 	const datesWithEntries = new Set(
 		calendarDays.filter((d) => d.hasEntry).map((d) => d.date),
@@ -186,6 +200,22 @@ export function JournalSidebar({
 											)}
 										</SidebarMenuAction>
 									)}
+									<SidebarMenuAction
+										showOnHover
+										onClick={(e) => {
+											e.stopPropagation();
+											setJournalToDelete(journal);
+										}}
+										className={cn("top-[50%]! translate-y-[-50%]",
+											journal.privacy === "private" ? "right-6" : "",
+											journal.id === activeJournalId
+												? "hover:bg-destructive/20 text-primary-foreground/80"
+												: "hover:bg-destructive/20 text-muted-foreground"
+										)}
+										title={t("journal.delete")}
+									>
+										<Trash2 className="size-3.5" />
+									</SidebarMenuAction>
 								</SidebarMenuItem>
 							))}
 						</SidebarMenu>
@@ -199,6 +229,29 @@ export function JournalSidebar({
 					<LanguageSwitch />
 				</div>
 			</SidebarFooter>
+
+			<AlertDialog open={!!journalToDelete} onOpenChange={(open) => !open && setJournalToDelete(null)}>
+				<AlertDialogContent>
+					<AlertDialogHeader>
+						<AlertDialogTitle>{t("journal.delete")}</AlertDialogTitle>
+						<AlertDialogDescription>{t("journal.deleteConfirm")}</AlertDialogDescription>
+					</AlertDialogHeader>
+					<AlertDialogFooter>
+						<AlertDialogCancel>{t("menu.cancel")}</AlertDialogCancel>
+						<AlertDialogAction
+							className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+							onClick={() => {
+								if (journalToDelete) {
+									onDeleteJournal(journalToDelete.id);
+									setJournalToDelete(null);
+								}
+							}}
+						>
+							{t("journal.delete")}
+						</AlertDialogAction>
+					</AlertDialogFooter>
+				</AlertDialogContent>
+			</AlertDialog>
 		</Sidebar>
 	);
 }

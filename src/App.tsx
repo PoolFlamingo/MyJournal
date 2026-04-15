@@ -34,7 +34,7 @@ function App() {
 				<UnlockScreen
 					journal={journal.pendingUnlockJournal}
 					onUnlock={journal.unlockJournal}
-					onBack={() => window.location.reload()}
+					onBack={journal.cancelUnlock}
 				/>
 			</main>
 		);
@@ -56,6 +56,7 @@ function App() {
 					onOpenJournal={journal.openJournal}
 					onLockJournal={journal.lockJournal}
 					onRequestCreateJournal={journal.createJournal}
+					onDeleteJournal={journal.deleteJournal}
 					onSaveEntry={journal.saveEntry}
 					onDeleteEntry={journal.deleteEntry}
 				/>
