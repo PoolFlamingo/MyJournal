@@ -1,38 +1,49 @@
 {
-  "$schema": "https://schema.tauri.app/config/2",
-  "productName": "My Journal",
-  "version": "0.1.0",
-  "identifier": "com.nitropc.myjournal",
-  "build": {
-    "beforeDevCommand": "npm run build:sidecar && npm run dev",
-    "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "npm run build:sidecar && npm run build",
-    "frontendDist": "../dist"
-  },
-  "app": {
-    "windows": [
-      {
-        "title": "My Journal",
-        "width": 1280,
-        "height": 1000
-      }
-    ],
-    "security": {
-      "csp": null
-    }
-  },
-  "bundle": {
-    "active": true,
-    "targets": "all",
-    "externalBin": [
-      "binaries/db-sidecar"
-    ],
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
-  }
+	"$schema": "https://schema.tauri.app/config/2",
+	"productName": "My Journal",
+	"version": "1.0.1",
+	"identifier": "com.nitropc.myjournal",
+	"build": {
+		"beforeDevCommand": "npm run build:sidecar && npm run dev",
+		"devUrl": "http://localhost:1420",
+		"beforeBuildCommand": "npm run build:sidecar && npm run build",
+		"frontendDist": "../dist"
+	},
+	"app": {
+		"windows": [
+			{
+				"title": "My Journal",
+				"width": 1280,
+				"height": 1000
+			}
+		],
+		"security": {
+			"csp": null
+		}
+	},
+	"plugins": {
+		"updater": {
+			"pubkey": "",
+			"endpoints": [
+				"https://github.com/nitropc/my-journal/releases/latest/download/latest.json"
+			],
+			"windows": {
+				"installMode": "passive"
+			}
+		}
+	},
+	"bundle": {
+		"active": true,
+		"targets": "all",
+		"externalBin": [
+			"binaries/db-sidecar"
+		],
+		"icon": [
+			"icons/32x32.png",
+			"icons/128x128.png",
+			"icons/128x128@2x.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		]
+	}
 }

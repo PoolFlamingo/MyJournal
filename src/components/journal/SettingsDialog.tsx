@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Package, Palette, Globe } from "lucide-react";
+import { Package, Palette, Globe, RefreshCw, Download, RotateCcw } from "lucide-react";
 import {
 	Dialog,
 	DialogContent,
@@ -10,8 +10,10 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
 import { useLanguage } from "@/components/language-provider";
+import { useUpdate } from "@/components/update-provider";
 import { useThemePreset } from "@/hooks/useThemePreset";
 import { useWeekStart } from "@/hooks/useWeekStart";
 import {
@@ -34,6 +36,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 	const { language, setLanguage, supportedLanguages } = useLanguage();
 	const { loadTheme, getSavedPreset, availablePresets, getDisplayName } = useThemePreset();
 	const { weekStart, setWeekStart } = useWeekStart();
+	const update = useUpdate();
 	const [selectedTheme, setSelectedTheme] = useState<string | undefined>(() => {
 		const saved = getSavedPreset();
 		return saved ?? "caffeine";
@@ -171,13 +174,117 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 								</p>
 								<div className="space-y-1 text-xs text-muted-foreground">
 									<p>
-										<span className="font-medium text-foreground">{t("journal:menu.versionLabel")}:</span> 0.1.0
+										<span className="font-medium text-foreground">{t("journal:menu.versionLabel")}:</span> {update.currentVersion}
 									</p>
 									<p>
 										<span className="font-medium text-foreground">{t("journal:menu.technologyLabel")}:</span> Tauri + React + TypeScript
 									</p>
 									<p>
 										<span className="font-medium text-foreground">{t("journal:menu.sidecarLabel")}:</span> Bun + SQLite
+									</p>
+								</div>
+							</div>
+
+							{/* Update section */}
+							<div className="rounded-lg border border-border/50 bg-muted/30 p-4 space-y-3">
+								<h4 className="font-semibold text-foreground text-sm">
+									{t("journal:settings.updates")}
+								</h4>
+
+								{/* Update status */}
+								{update.error && (
+									<p className="text-xs text-destructive cursor-pointer" onClick={update.dismissError}>
+										{t("journal:settings.updateError")}: {update.error}
+									</p>
+								)}
+
+								{update.downloaded && update.availableVersion && (
+									<div className="space-y-2">
+										<p className="text-xs text-emerald-600 dark:text-emerald-400">
+											{t("journal:settings.readyToInstallDescription", { version: update.availableVersion })}
+										</p>
+										<Button
+											size="sm"
+											onClick={() => void update.installAndRestart()}
+											className="gap-2"
+										>
+											<RotateCcw className="size-3" />
+											{t("journal:settings.installAndRestart")}
+										</Button>
+									</div>
+								)}
+
+								{!update.downloaded && update.availableVersion && !update.downloading && (
+									<div className="space-y-2">
+										<p className="text-xs text-amber-600 dark:text-amber-400">
+											{t("journal:settings.updateAvailableDescription", { version: update.availableVersion })}
+										</p>
+										<Button
+											size="sm"
+											variant="outline"
+											onClick={() => void update.downloadUpdate()}
+											className="gap-2"
+										>
+											<Download className="size-3" />
+											{t("journal:settings.downloadAndInstall")}
+										</Button>
+									</div>
+								)}
+
+								{update.downloading && (
+									<div className="space-y-2">
+										<p className="text-xs text-muted-foreground">
+											{t("journal:settings.downloading")}
+										</p>
+										{update.progress && update.progress.contentLength > 0 && (
+											<div className="h-1.5 w-full rounded-full bg-muted">
+												<div
+													className="h-1.5 rounded-full bg-primary transition-all"
+													style={{ width: `${Math.round((update.progress.downloaded / update.progress.contentLength) * 100)}%` }}
+												/>
+											</div>
+										)}
+									</div>
+								)}
+
+								{!update.availableVersion && !update.checking && !update.error && (
+									<p className="text-xs text-muted-foreground">
+										{t("journal:settings.noUpdate")}
+									</p>
+								)}
+
+								{/* Check for updates button */}
+								<Button
+									size="sm"
+									variant="ghost"
+									disabled={update.checking || update.downloading}
+									onClick={() => void update.checkNow()}
+									className="gap-2"
+								>
+									<RefreshCw className={cn("size-3", update.checking && "animate-spin")} />
+									{update.checking
+										? t("journal:settings.checking")
+										: t("journal:settings.checkForUpdates")}
+								</Button>
+
+								{/* Update mode selector */}
+								<div className="border-t border-border/40 pt-3">
+									<Label htmlFor="update-mode-select" className="text-xs font-medium mb-2 block">
+										{t("journal:settings.updateMode")}
+									</Label>
+									<Select value={update.mode} onValueChange={(value) => void update.setMode(value as "notify" | "background")}>
+										<SelectTrigger id="update-mode-select" className="h-8 text-xs">
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="notify">{t("journal:settings.updateModeNotify")}</SelectItem>
+											<SelectItem value="background">{t("journal:settings.updateModeBackground")}</SelectItem>
+										</SelectContent>
+									</Select>
+									<p className="text-xs text-muted-foreground mt-1">
+										{update.mode === "notify"
+											? t("journal:settings.updateModeNotifyDescription")
+											: t("journal:settings.updateModeBackgroundDescription")}
 									</p>
 								</div>
 							</div>
