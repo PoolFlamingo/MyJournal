@@ -23,7 +23,7 @@
 	},
 	"plugins": {
 		"updater": {
-			"pubkey": "",
+			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDYyNjJCMUI5M0JGNzZFRDMKUldUVGJ2Yzd1YkZpWXZqTitiY1lBcWJMTGpIV1BBa3RzajZLVGxSMFlDZE4xZ1ZWejl4UDVlamQK",
 			"endpoints": [
 				"https://github.com/nitropc/my-journal/releases/latest/download/latest.json"
 			],
