@@ -20,8 +20,8 @@ i18n.use(initReactI18next).init({
       journal: journalEn,
     },
   },
-  lng: "es",
-  fallbackLng: ["es"],
+  lng: "en",
+  fallbackLng: ["en"],
   ns: ["common", "todo", "journal"],
   defaultNS: "common",
   interpolation: {
