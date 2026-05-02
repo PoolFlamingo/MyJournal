@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { sidecar } from "@/services/sidecar";
 import * as journalApi from "@/services/journalApi";
 import type {
 	JournalSummary,
@@ -64,9 +63,6 @@ export function useJournal(): UseJournalReturn {
 
 		async function init() {
 			try {
-				await sidecar.init();
-				if (!mountedRef.current) return;
-
 				const result = await journalApi.appBootstrap();
 				if (!mountedRef.current) return;
 
@@ -118,7 +114,6 @@ export function useJournal(): UseJournalReturn {
 
 		return () => {
 			mountedRef.current = false;
-			sidecar.destroy();
 		};
 	}, []);
 

@@ -4,9 +4,9 @@
 	"version": "1.1.2",
 	"identifier": "com.nitropc.myjournal",
 	"build": {
-		"beforeDevCommand": "npm run build:sidecar && npm run dev",
+		"beforeDevCommand": "npm run dev",
 		"devUrl": "http://localhost:1420",
-		"beforeBuildCommand": "npm run build:sidecar && npm run build",
+		"beforeBuildCommand": "npm run build",
 		"frontendDist": "../dist"
 	},
 	"app": {
@@ -30,14 +30,14 @@
 			"windows": {
 				"installMode": "passive"
 			}
+		},
+		"sql": {
+			"preload": ["sqlite:my-journal.db"]
 		}
 	},
 	"bundle": {
 		"active": true,
 		"targets": "all",
-		"externalBin": [
-			"binaries/db-sidecar"
-		],
 		"icon": [
 			"icons/32x32.png",
 			"icons/128x128.png",

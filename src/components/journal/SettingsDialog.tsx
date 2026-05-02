@@ -180,7 +180,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 										<span className="font-medium text-foreground">{t("journal:menu.technologyLabel")}:</span> Tauri + React + TypeScript
 									</p>
 									<p>
-										<span className="font-medium text-foreground">{t("journal:menu.sidecarLabel")}:</span> Bun + SQLite
+										<span className="font-medium text-foreground">{t("journal:menu.storageLabel")}:</span> {t("journal:menu.storageValue")}
 									</p>
 								</div>
 							</div>

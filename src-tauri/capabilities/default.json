@@ -8,26 +8,8 @@
     "opener:default",
     "store:default",
     "os:default",
-    {
-      "identifier": "shell:allow-spawn",
-      "allow": [
-        {
-          "name": "binaries/db-sidecar",
-          "sidecar": true,
-          "args": true
-        }
-      ]
-    },
-    {
-      "identifier": "shell:allow-stdin-write",
-      "allow": [
-        {
-          "name": "binaries/db-sidecar",
-          "sidecar": true
-        }
-      ]
-    },
-    "shell:allow-kill",
+    "sql:default",
+    "sql:allow-execute",
     "updater:default",
     "process:allow-restart"
   ]

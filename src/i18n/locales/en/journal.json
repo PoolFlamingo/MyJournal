@@ -149,7 +149,8 @@
 		"creating": "Creating...",
 		"versionLabel": "Version",
 		"technologyLabel": "Technology",
-		"sidecarLabel": "Engine"
+		"storageLabel": "Storage",
+		"storageValue": "Tauri SQLite"
 	},
 	"calendar": {
 		"today": "Today",

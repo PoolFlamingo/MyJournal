@@ -1,4 +1,4 @@
-import { sidecar } from "./sidecar";
+import { invoke } from "@tauri-apps/api/core";
 import type {
 	JournalSummary,
 	JournalDetails,
@@ -13,50 +13,47 @@ import type {
 // ── App lifecycle ─────────────────────────────────────────────────────
 
 export async function appBootstrap(): Promise<BootstrapResult> {
-	return sidecar.request<BootstrapResult>("app.bootstrap");
+	return invoke<BootstrapResult>("app_bootstrap");
 }
 
 export async function setSetting(key: string, value: string): Promise<void> {
-	return sidecar.request("app.setSetting", { key, value });
+	return invoke("app_set_setting", { key, value });
 }
 
 export async function getSetting(key: string): Promise<string | null> {
-	return sidecar.request<string | null>("app.getSetting", { key });
+	return invoke<string | null>("app_get_setting", { key });
 }
 
 // ── Journal CRUD ──────────────────────────────────────────────────────
 
 export async function listJournals(): Promise<JournalSummary[]> {
-	return sidecar.request<JournalSummary[]>("journal.list");
+	return invoke<JournalSummary[]>("journal_list");
 }
 
 export async function createJournal(data: CreateJournalDto): Promise<JournalSummary> {
-	return sidecar.request<JournalSummary>(
-		"journal.create",
-		data as unknown as Record<string, unknown>,
-	);
+	return invoke<JournalSummary>("journal_create", { data });
 }
 
 export async function openJournal(id: string): Promise<JournalDetails> {
-	return sidecar.request<JournalDetails>("journal.open", { id });
+	return invoke<JournalDetails>("journal_open", { id });
 }
 
 export async function renameJournal(id: string, name: string): Promise<JournalSummary> {
-	return sidecar.request<JournalSummary>("journal.rename", { id, name });
+	return invoke<JournalSummary>("journal_rename", { id, name });
 }
 
-export async function deleteJournal(id: string, password?: string): Promise<void> {
-	return sidecar.request("journal.delete", { id, password });
+export async function deleteJournal(id: string): Promise<void> {
+	return invoke("journal_delete", { id });
 }
 
 // ── Unlock / Lock ─────────────────────────────────────────────────────
 
 export async function unlockJournal(id: string, password: string): Promise<JournalSummary> {
-	return sidecar.request<JournalSummary>("journal.unlock", { id, password });
+	return invoke<JournalSummary>("journal_unlock", { id, password });
 }
 
 export async function lockJournal(id: string): Promise<void> {
-	return sidecar.request("journal.lock", { id });
+	return invoke("journal_lock", { id });
 }
 
 // ── Entry CRUD ────────────────────────────────────────────────────────
@@ -65,18 +62,15 @@ export async function getEntryByDate(
 	journalId: string,
 	date: string,
 ): Promise<EntryDocument | null> {
-	return sidecar.request<EntryDocument | null>("entry.getByDate", { journalId, date });
+	return invoke<EntryDocument | null>("entry_get_by_date", { journalId, date });
 }
 
 export async function saveEntry(data: SaveEntryDto): Promise<EntrySummary> {
-	return sidecar.request<EntrySummary>(
-		"entry.save",
-		data as unknown as Record<string, unknown>,
-	);
+	return invoke<EntrySummary>("entry_save", { data });
 }
 
 export async function deleteEntry(journalId: string, date: string): Promise<void> {
-	return sidecar.request("entry.delete", { journalId, date });
+	return invoke("entry_delete", { journalId, date });
 }
 
 export async function listMonth(
@@ -84,9 +78,5 @@ export async function listMonth(
 	year: number,
 	month: number,
 ): Promise<CalendarDayState[]> {
-	return sidecar.request<CalendarDayState[]>("entry.listMonth", {
-		journalId,
-		year,
-		month,
-	});
+	return invoke<CalendarDayState[]>("entry_list_month", { journalId, year, month });
 }

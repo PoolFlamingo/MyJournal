@@ -1,8 +1,14 @@
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+mod commands;
+mod db;
+mod state;
+mod types;
+
+use commands::entries::{entry_delete, entry_get_by_date, entry_list_month, entry_save};
+use commands::journals::{
+    app_bootstrap, app_get_setting, app_set_setting, journal_create, journal_delete, journal_list,
+    journal_lock, journal_open, journal_rename, journal_unlock,
+};
+use state::UnlockedJournals;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -10,10 +16,30 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
-        .invoke_handler(tauri::generate_handler![greet])
+        .plugin(
+            tauri_plugin_sql::Builder::default()
+                .add_migrations(db::DB_URL, db::migrations())
+                .build(),
+        )
+        .manage(UnlockedJournals::default())
+        .invoke_handler(tauri::generate_handler![
+            app_bootstrap,
+            app_get_setting,
+            app_set_setting,
+            journal_list,
+            journal_create,
+            journal_open,
+            journal_rename,
+            journal_delete,
+            journal_unlock,
+            journal_lock,
+            entry_get_by_date,
+            entry_save,
+            entry_delete,
+            entry_list_month,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
