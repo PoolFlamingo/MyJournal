@@ -16,7 +16,7 @@ jobs:
             bundles: msi,nsis
           - os: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
-            bundles: deb,rpm
+            bundles: deb,rpm,appimage
           - os: macos-latest
             target: aarch64-apple-darwin
             bundles: dmg,app
@@ -119,7 +119,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Extract version from tag (strip leading 'v')
           VERSION="${GITHUB_REF_NAME#v}"
           TAG="${GITHUB_REF_NAME}"
           REPO="${GITHUB_REPOSITORY}"
@@ -127,18 +126,26 @@ jobs:
           DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           NOTES="See release notes at https://github.com/${REPO}/releases/tag/${TAG}"
 
-          # Read signature files
+          # GitHub Releases substitutes spaces with dots in asset filenames at
+          # upload time. Rename local bundles the same way so latest.json URLs
+          # match the public asset names.
+          while IFS= read -r -d '' file; do
+            dir=$(dirname "$file")
+            base=$(basename "$file")
+            renamed="${base// /.}"
+            if [ "$base" != "$renamed" ]; then
+              mv "$file" "$dir/$renamed"
+            fi
+          done < <(find bundles -type f -print0)
+
           read_sig() {
-            local pattern="$1"
             local file
-            file=$(find bundles/ -name "$pattern" -type f 2>/dev/null | head -1)
-            if [ -n "$file" ]; then cat "$file"; else echo ""; fi
+            file=$(find bundles/ -name "$1" -type f 2>/dev/null | head -1)
+            [ -n "$file" ] && cat "$file" || echo ""
           }
 
-          # Find bundle filenames
           find_name() {
-            local pattern="$1"
-            find bundles/ -name "$pattern" -not -name "*.sig" -type f 2>/dev/null | head -1 | xargs -r basename
+            find bundles/ -name "$1" -not -name "*.sig" -type f -printf "%f\n" 2>/dev/null | head -1
           }
 
           NSIS_NAME=$(find_name "*.exe")
@@ -148,31 +155,38 @@ jobs:
           MACOS_NAME=$(find_name "*.app.tar.gz")
           MACOS_SIG=$(read_sig "*.app.tar.gz.sig")
 
-          # Build the manifest JSON
-          cat > latest.json << MANIFEST
-          {
-            "version": "${VERSION}",
-            "notes": "${NOTES}",
-            "pub_date": "${DATE}",
-            "platforms": {
-              "windows-x86_64": {
-                "signature": "${NSIS_SIG}",
-                "url": "${BASE_URL}/${NSIS_NAME}"
-              },
-              "linux-x86_64": {
-                "signature": "${APPIMAGE_SIG}",
-                "url": "${BASE_URL}/${APPIMAGE_NAME}"
-              },
-              "darwin-aarch64": {
-                "signature": "${MACOS_SIG}",
-                "url": "${BASE_URL}/${MACOS_NAME}"
+          jq -n \
+            --arg version "$VERSION" \
+            --arg notes "$NOTES" \
+            --arg pub_date "$DATE" \
+            --arg win_url "$BASE_URL/$NSIS_NAME" \
+            --arg win_sig "$NSIS_SIG" \
+            --arg lin_url "$BASE_URL/$APPIMAGE_NAME" \
+            --arg lin_sig "$APPIMAGE_SIG" \
+            --arg mac_url "$BASE_URL/$MACOS_NAME" \
+            --arg mac_sig "$MACOS_SIG" \
+            '{
+              version: $version,
+              notes: $notes,
+              pub_date: $pub_date,
+              platforms: {
+                "windows-x86_64": { signature: $win_sig, url: $win_url },
+                "linux-x86_64":   { signature: $lin_sig, url: $lin_url },
+                "darwin-aarch64": { signature: $mac_sig, url: $mac_url }
               }
-            }
-          }
-          MANIFEST
+            }' > latest.json
 
           echo "Generated latest.json:"
           cat latest.json
+
+          # Bail out loudly if any platform url ends in '/' (empty filename)
+          # or any signature is empty. Either case means the bundle/sig was
+          # missing — most likely TAURI_SIGNING_PRIVATE_KEY is not set.
+          if grep -qE '"url": "[^"]*/"' latest.json || grep -q '"signature": ""' latest.json; then
+            echo "::error::latest.json is incomplete — auto-update would fail in production."
+            echo "Verify that TAURI_SIGNING_PRIVATE_KEY and TAURI_SIGNING_PRIVATE_KEY_PASSWORD secrets are configured, and that bundles for all targets were produced."
+            exit 1
+          fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
