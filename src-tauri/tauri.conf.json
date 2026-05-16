@@ -23,7 +23,7 @@
 	},
 	"plugins": {
 		"updater": {
-			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDYyNjJCMUI5M0JGNzZFRDMKUldUVGJ2Yzd1YkZpWXZqTitiY1lBcWJMTGpIV1BBa3RzajZLVGxSMFlDZE4xZ1ZWejl4UDVlamQK",
+			"pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEI5MjhDMDYyOUNDQzA4NDcKUldSSENNeWNZc0FvdVI0NzBxWmJtUW9NYVQvNzhIaDlLNldVVHVuR2tBSGpQUXVXWGFFV2N5R2kK",
 			"endpoints": [
 				"https://github.com/PoolFlamingo/MyJournal/releases/latest/download/latest.json"
 			],
