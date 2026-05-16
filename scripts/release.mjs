@@ -12,6 +12,7 @@
  *   package.json                 "version"
  *   src-tauri/tauri.conf.json    "version"
  *   src-tauri/Cargo.toml         version = "..."
+ *   src-tauri/Cargo.lock         resynced via cargo update -p MyJournal
  */
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -92,6 +93,15 @@ function updateCargoToml(next) {
 	writeFileSync(path, content);
 }
 
+function syncCargoLock() {
+	// Cargo.lock pins our own crate to its previous version; running cargo
+	// update against the bumped Cargo.toml rewrites that pin so the lockfile
+	// lands in the same release commit instead of as a stray change later.
+	run("cargo update -p MyJournal --manifest-path src-tauri/Cargo.toml", {
+		stdio: "inherit",
+	});
+}
+
 // ── main ──────────────────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
@@ -144,7 +154,10 @@ try {
 updatePackageJson(nextVersion);
 updateTauriConf(nextVersion);
 updateCargoToml(nextVersion);
-console.log(`\n  Updated package.json, tauri.conf.json, Cargo.toml → ${nextVersion}`);
+syncCargoLock();
+console.log(
+	`\n  Updated package.json, tauri.conf.json, Cargo.toml, Cargo.lock → ${nextVersion}`
+);
 
 // Git commit + tag + push
 try {
