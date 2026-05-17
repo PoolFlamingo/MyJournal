@@ -1,9 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { JournalSidebar } from "@/components/journal/JournalSidebar";
 import { EntryEditor } from "@/components/journal/EntryEditor";
-import { BookOpenText } from "lucide-react";
+import { BookOpenText, PanelLeftIcon } from "lucide-react";
 import type {
 	JournalSummary,
 	JournalDetails,
@@ -47,8 +46,38 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import {
+	ResizableHandle,
+	ResizablePanel,
+	ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 import type { EntryEditorCommands } from "@/components/journal/EntryEditor";
 import { SettingsDialog } from "@/components/journal/SettingsDialog";
+import type { Layout, PanelImperativeHandle } from "react-resizable-panels";
+
+const LAYOUT_STORAGE_KEY = "my-journal-workspace-layout";
+
+function loadStoredLayout(): Layout | undefined {
+	try {
+		const raw = localStorage.getItem(LAYOUT_STORAGE_KEY);
+		if (!raw) return undefined;
+		const parsed = JSON.parse(raw) as Layout;
+		if (!Array.isArray(parsed) || parsed.length !== 2) return undefined;
+		return parsed;
+	} catch {
+		return undefined;
+	}
+}
+
+function saveLayout(layout: Layout): void {
+	try {
+		localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(layout));
+	} catch {
+		// localStorage unavailable; ignore.
+	}
+}
 
 interface JournalWorkspaceProps {
 	journals: JournalSummary[];
@@ -95,6 +124,50 @@ export function JournalWorkspace({
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [titleRequired, setTitleRequired] = useState(true);
 	const [editorCommands, setEditorCommands] = useState<EntryEditorCommands | null>(null);
+	const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+	const isMobile = useIsMobile();
+	const sidebarPanelRef = useRef<PanelImperativeHandle>(null);
+	const storedLayout = loadStoredLayout();
+	const [panelAnimating, setPanelAnimating] = useState(false);
+	const panelAnimateTimeoutRef = useRef<number | null>(null);
+
+	const toggleSidebar = () => {
+		if (isMobile) {
+			setMobileSidebarOpen((open) => !open);
+			return;
+		}
+		const panel = sidebarPanelRef.current;
+		if (!panel) return;
+
+		setPanelAnimating(true);
+		if (panelAnimateTimeoutRef.current !== null) {
+			window.clearTimeout(panelAnimateTimeoutRef.current);
+		}
+		panelAnimateTimeoutRef.current = window.setTimeout(() => {
+			setPanelAnimating(false);
+			panelAnimateTimeoutRef.current = null;
+		}, 260);
+
+		if (panel.isCollapsed()) {
+			panel.expand();
+		} else {
+			panel.collapse();
+		}
+	};
+
+	// Ctrl/Cmd+B: toggle sidebar (matches previous shadcn Sidebar shortcut).
+	useEffect(() => {
+		const handler = (event: KeyboardEvent) => {
+			if (event.key === "b" && (event.metaKey || event.ctrlKey)) {
+				event.preventDefault();
+				toggleSidebar();
+			}
+		};
+		window.addEventListener("keydown", handler);
+		return () => window.removeEventListener("keydown", handler);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [isMobile]);
 
 	const resetCreateForm = () => {
 		setName("");
@@ -127,154 +200,242 @@ export function JournalWorkspace({
 
 	const today = new Date().toISOString().split("T")[0];
 
+	const sidebarContent = (
+		<JournalSidebar
+			journals={journals}
+			activeJournalId={activeJournal.id}
+			calendarDays={calendarDays}
+			selectedDate={selectedDate}
+			onSelectDate={(date) => {
+				void onSelectDate(date);
+				if (isMobile) setMobileSidebarOpen(false);
+			}}
+			onMonthChange={onMonthChange}
+			onOpenJournal={(id) => {
+				void onOpenJournal(id);
+				if (isMobile) setMobileSidebarOpen(false);
+			}}
+			onLockJournal={(id) => onLockJournal(id)}
+			onDeleteJournal={(id) => onDeleteJournal(id)}
+			onCreateJournal={() => setShowCreateDialog(true)}
+		/>
+	);
+
+	const mainContent = (
+		<div className="flex h-full min-w-0 flex-col bg-background overflow-hidden">
+			<header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
+				<Button
+					variant="ghost"
+					size="icon"
+					className="text-muted-foreground hover:text-foreground size-7"
+					onClick={toggleSidebar}
+					aria-label={t("sidebar.toggle", "Mostrar / ocultar barra lateral")}
+					title={t("sidebar.toggle", "Mostrar / ocultar barra lateral")}
+				>
+					<PanelLeftIcon className="size-4" />
+				</Button>
+				<Separator orientation="vertical" className="h-4 bg-border/60" />
+				<Menubar className="h-8 rounded-lg border-border/60">
+					<MenubarMenu>
+						<MenubarTrigger>{t("menu.file", "Archivo")}</MenubarTrigger>
+						<MenubarContent>
+							<MenubarItem onClick={() => setShowCreateDialog(true)}>
+								{t("menu.newJournal", "Nuevo diario")}
+								<MenubarShortcut>Ctrl+N</MenubarShortcut>
+							</MenubarItem>
+							<MenubarSub>
+								<MenubarSubTrigger>
+									{t("menu.openJournal", "Abrir diario")}
+								</MenubarSubTrigger>
+								<MenubarSubContent>
+									{journals.map((journal) => (
+										<MenubarItem
+											key={journal.id}
+											onClick={() => void onOpenJournal(journal.id)}
+										>
+											{journal.name}
+										</MenubarItem>
+									))}
+								</MenubarSubContent>
+							</MenubarSub>
+							<MenubarSeparator />
+							<MenubarItem
+								onClick={() => void editorCommands?.save()}
+								disabled={!editorCommands?.canSave}
+							>
+								{t("menu.saveEntry", "Guardar entrada")}
+								<MenubarShortcut>Ctrl+S</MenubarShortcut>
+							</MenubarItem>
+							<MenubarItem
+								onClick={() => void editorCommands?.deleteEntry()}
+								disabled={!editorCommands?.canDelete}
+								variant="destructive"
+							>
+								{t("menu.deleteEntry", "Eliminar entrada")}
+							</MenubarItem>
+							<MenubarSeparator />
+							<MenubarItem
+								onClick={() => void onLockJournal(activeJournal.id)}
+								disabled={activeJournal.privacy !== "private"}
+							>
+								{t("menu.lockJournal", "Bloquear diario")}
+							</MenubarItem>
+						</MenubarContent>
+					</MenubarMenu>
+
+					<MenubarMenu>
+						<MenubarTrigger>{t("menu.edit", "Editar")}</MenubarTrigger>
+						<MenubarContent>
+							<MenubarItem
+								onClick={() => editorCommands?.undo()}
+								disabled={!editorCommands?.canUndo}
+							>
+								{t("menu.undo", "Deshacer")}
+								<MenubarShortcut>Ctrl+Z</MenubarShortcut>
+							</MenubarItem>
+							<MenubarItem
+								onClick={() => editorCommands?.redo()}
+								disabled={!editorCommands?.canRedo}
+							>
+								{t("menu.redo", "Rehacer")}
+								<MenubarShortcut>Ctrl+Y</MenubarShortcut>
+							</MenubarItem>
+							<MenubarSeparator />
+							<MenubarItem
+								onClick={() => editorCommands?.toggleBold()}
+								disabled={!editorCommands}
+							>
+								{t("menu.bold", "Negrita")}
+								<MenubarShortcut>Ctrl+B</MenubarShortcut>
+							</MenubarItem>
+							<MenubarItem
+								onClick={() => editorCommands?.toggleItalic()}
+								disabled={!editorCommands}
+							>
+								{t("menu.italic", "Cursiva")}
+								<MenubarShortcut>Ctrl+I</MenubarShortcut>
+							</MenubarItem>
+							<MenubarItem
+								onClick={() => editorCommands?.toggleUnderline()}
+								disabled={!editorCommands}
+							>
+								{t("menu.underline", "Subrayado")}
+								<MenubarShortcut>Ctrl+U</MenubarShortcut>
+							</MenubarItem>
+						</MenubarContent>
+					</MenubarMenu>
+
+					<MenubarMenu>
+						<MenubarTrigger>{t("menu.journal", "Diario")}</MenubarTrigger>
+						<MenubarContent>
+							<MenubarItem onClick={() => void onSelectDate(today)}>
+								{t("menu.goToday", "Ir a hoy")}
+							</MenubarItem>
+							<MenubarItem onClick={() => void onOpenJournal(activeJournal.id)}>
+								{t("menu.reopenJournal", "Recargar diario activo")}
+							</MenubarItem>
+						</MenubarContent>
+					</MenubarMenu>
+
+					<MenubarMenu>
+						<MenubarTrigger>{t("menu.view", "Ver")}</MenubarTrigger>
+						<MenubarContent>
+							<MenubarItem onClick={() => setShowSettings(true)}>
+								{t("menu.settings", "Configuración")}
+								<MenubarShortcut>Ctrl+,</MenubarShortcut>
+							</MenubarItem>
+						</MenubarContent>
+					</MenubarMenu>
+
+					<MenubarMenu>
+						<MenubarTrigger>{t("menu.help", "Ayuda")}</MenubarTrigger>
+						<MenubarContent>
+							<MenubarItem onClick={() => setShowShortcuts(true)}>
+								{t("menu.shortcuts", "Atajos de teclado")}
+							</MenubarItem>
+						</MenubarContent>
+					</MenubarMenu>
+				</Menubar>
+				<div className="flex items-center gap-2">
+					<BookOpenText className="size-4 text-primary" />
+					<h2 className="text-sm font-semibold tracking-tight">{activeJournal.name}</h2>
+					{activeJournal.privacy === "private" && (
+						<span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-primary">
+							{t("journal.private")}
+						</span>
+					)}
+				</div>
+			</header>
+			<main className="flex-1 overflow-hidden relative">
+				<EntryEditor
+					journalId={activeJournal.id}
+					selectedDate={selectedDate}
+					entry={currentEntry}
+					loading={entryLoading}
+					titleRequired={activeJournal.titleRequired}
+					onSave={onSaveEntry}
+					onDelete={onDeleteEntry}
+					onCommandsChange={setEditorCommands}
+				/>
+			</main>
+		</div>
+	);
+
 	return (
-		<SidebarProvider>
-			<JournalSidebar
-				journals={journals}
-				activeJournalId={activeJournal.id}
-				calendarDays={calendarDays}
-				selectedDate={selectedDate}
-				onSelectDate={(date) => onSelectDate(date)}
-				onMonthChange={onMonthChange}
-				onOpenJournal={(id) => onOpenJournal(id)}
-				onLockJournal={(id) => onLockJournal(id)}
-				onDeleteJournal={(id) => onDeleteJournal(id)}
-				onCreateJournal={() => setShowCreateDialog(true)}
-			/>
-			<SidebarInset className="bg-background flex flex-col h-screen overflow-hidden">
-				<header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/60">
-					<SidebarTrigger className="text-muted-foreground hover:text-foreground" />
-					<Separator orientation="vertical" className="h-4 bg-border/60" />
-					<Menubar className="h-8 rounded-lg border-border/60">
-						<MenubarMenu>
-							<MenubarTrigger>{t("menu.file", "Archivo")}</MenubarTrigger>
-							<MenubarContent>
-								<MenubarItem onClick={() => setShowCreateDialog(true)}>
-									{t("menu.newJournal", "Nuevo diario")}
-									<MenubarShortcut>Ctrl+N</MenubarShortcut>
-								</MenubarItem>
-								<MenubarSub>
-									<MenubarSubTrigger>{t("menu.openJournal", "Abrir diario")}</MenubarSubTrigger>
-									<MenubarSubContent>
-										{journals.map((journal) => (
-											<MenubarItem key={journal.id} onClick={() => void onOpenJournal(journal.id)}>
-												{journal.name}
-											</MenubarItem>
-										))}
-									</MenubarSubContent>
-								</MenubarSub>
-								<MenubarSeparator />
-								<MenubarItem
-									onClick={() => void editorCommands?.save()}
-									disabled={!editorCommands?.canSave}
-								>
-									{t("menu.saveEntry", "Guardar entrada")}
-									<MenubarShortcut>Ctrl+S</MenubarShortcut>
-								</MenubarItem>
-								<MenubarItem
-									onClick={() => void editorCommands?.deleteEntry()}
-									disabled={!editorCommands?.canDelete}
-									variant="destructive"
-								>
-									{t("menu.deleteEntry", "Eliminar entrada")}
-								</MenubarItem>
-								<MenubarSeparator />
-								<MenubarItem
-									onClick={() => void onLockJournal(activeJournal.id)}
-									disabled={activeJournal.privacy !== "private"}
-								>
-									{t("menu.lockJournal", "Bloquear diario")}
-								</MenubarItem>
-							</MenubarContent>
-						</MenubarMenu>
-
-						<MenubarMenu>
-							<MenubarTrigger>{t("menu.edit", "Editar")}</MenubarTrigger>
-							<MenubarContent>
-								<MenubarItem onClick={() => editorCommands?.undo()} disabled={!editorCommands?.canUndo}>
-									{t("menu.undo", "Deshacer")}
-									<MenubarShortcut>Ctrl+Z</MenubarShortcut>
-								</MenubarItem>
-								<MenubarItem onClick={() => editorCommands?.redo()} disabled={!editorCommands?.canRedo}>
-									{t("menu.redo", "Rehacer")}
-									<MenubarShortcut>Ctrl+Y</MenubarShortcut>
-								</MenubarItem>
-								<MenubarSeparator />
-								<MenubarItem onClick={() => editorCommands?.toggleBold()} disabled={!editorCommands}>
-									{t("menu.bold", "Negrita")}
-									<MenubarShortcut>Ctrl+B</MenubarShortcut>
-								</MenubarItem>
-								<MenubarItem onClick={() => editorCommands?.toggleItalic()} disabled={!editorCommands}>
-									{t("menu.italic", "Cursiva")}
-									<MenubarShortcut>Ctrl+I</MenubarShortcut>
-								</MenubarItem>
-								<MenubarItem onClick={() => editorCommands?.toggleUnderline()} disabled={!editorCommands}>
-									{t("menu.underline", "Subrayado")}
-									<MenubarShortcut>Ctrl+U</MenubarShortcut>
-								</MenubarItem>
-							</MenubarContent>
-						</MenubarMenu>
-
-						<MenubarMenu>
-							<MenubarTrigger>{t("menu.journal", "Diario")}</MenubarTrigger>
-							<MenubarContent>
-								<MenubarItem onClick={() => void onSelectDate(today)}>
-									{t("menu.goToday", "Ir a hoy")}
-								</MenubarItem>
-								<MenubarItem onClick={() => void onOpenJournal(activeJournal.id)}>
-									{t("menu.reopenJournal", "Recargar diario activo")}
-								</MenubarItem>
-							</MenubarContent>
-						</MenubarMenu>
-
-						<MenubarMenu>
-							<MenubarTrigger>{t("menu.view", "Ver")}</MenubarTrigger>
-							<MenubarContent>
-								<MenubarItem onClick={() => setShowSettings(true)}>
-									{t("menu.settings", "Configuración")}
-									<MenubarShortcut>Ctrl+,</MenubarShortcut>
-								</MenubarItem>
-							</MenubarContent>
-						</MenubarMenu>
-
-						<MenubarMenu>
-							<MenubarTrigger>{t("menu.help", "Ayuda")}</MenubarTrigger>
-							<MenubarContent>
-								<MenubarItem onClick={() => setShowShortcuts(true)}>
-									{t("menu.shortcuts", "Atajos de teclado")}
-								</MenubarItem>
-							</MenubarContent>
-						</MenubarMenu>
-					</Menubar>
-					<div className="flex items-center gap-2">
-						<BookOpenText className="size-4 text-primary" />
-						<h2 className="text-sm font-semibold tracking-tight">{activeJournal.name}</h2>
-						{activeJournal.privacy === "private" && (
-							<span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-widest text-primary">
-								{t("journal.private")}
-							</span>
-						)}
-					</div>
-				</header>
-				<main className="flex-1 overflow-hidden relative">
-					<EntryEditor
-						journalId={activeJournal.id}
-						selectedDate={selectedDate}
-						entry={currentEntry}
-						loading={entryLoading}
-						titleRequired={activeJournal.titleRequired}
-						onSave={onSaveEntry}
-						onDelete={onDeleteEntry}
-						onCommandsChange={setEditorCommands}
-					/>
-				</main>
-			</SidebarInset>
+		<>
+			{isMobile ? (
+				<div className="flex h-screen w-full">
+					<Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+						<SheetContent side="left" className="w-72 p-0">
+							<SheetTitle className="sr-only">
+								{t("sidebar.workspace", "Espacio de trabajo")}
+							</SheetTitle>
+							{sidebarContent}
+						</SheetContent>
+					</Sheet>
+					{mainContent}
+				</div>
+			) : (
+				<ResizablePanelGroup
+					orientation="horizontal"
+					defaultLayout={storedLayout}
+					onLayoutChanged={saveLayout}
+					className={
+						panelAnimating
+							? "mj-panel-animating h-screen w-full"
+							: "h-screen w-full"
+					}
+				>
+					<ResizablePanel
+						panelRef={sidebarPanelRef}
+						defaultSize="22%"
+						minSize="270px"
+						maxSize="40%"
+						collapsible
+						collapsedSize={0}
+						className="border-r border-border/40"
+					>
+						{sidebarContent}
+					</ResizablePanel>
+					<ResizableHandle withHandle />
+					<ResizablePanel defaultSize="78%" minSize="40%">
+						{mainContent}
+					</ResizablePanel>
+				</ResizablePanelGroup>
+			)}
 
 			<Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
 				<DialogContent className="sm:max-w-lg">
 					<DialogHeader>
-						<DialogTitle className="text-2xl">{t("menu.newJournal", "Nuevo diario")}</DialogTitle>
-						<DialogDescription>{t("menu.createJournalDescription", "Crea un diario y empieza a escribir en segundos.")}</DialogDescription>
+						<DialogTitle className="text-2xl">
+							{t("menu.newJournal", "Nuevo diario")}
+						</DialogTitle>
+						<DialogDescription>
+							{t(
+								"menu.createJournalDescription",
+								"Crea un diario y empieza a escribir en segundos."
+							)}
+						</DialogDescription>
 					</DialogHeader>
 					<div className="flex flex-col gap-5 py-2">
 						<div className="space-y-2">
@@ -288,7 +449,9 @@ export function JournalWorkspace({
 							/>
 						</div>
 						<div className="space-y-2">
-							<Label htmlFor="workspace-journal-description">{t("journal.description")}</Label>
+							<Label htmlFor="workspace-journal-description">
+								{t("journal.description")}
+							</Label>
 							<Textarea
 								id="workspace-journal-description"
 								placeholder={t("journal.descriptionPlaceholder")}
@@ -299,7 +462,10 @@ export function JournalWorkspace({
 						</div>
 						<div className="space-y-2">
 							<Label>{t("journal.privacy")}</Label>
-							<Select value={privacy} onValueChange={(value) => setPrivacy(value as JournalPrivacy)}>
+							<Select
+								value={privacy}
+								onValueChange={(value) => setPrivacy(value as JournalPrivacy)}
+							>
 								<SelectTrigger>
 									<SelectValue />
 								</SelectTrigger>
@@ -312,7 +478,9 @@ export function JournalWorkspace({
 						{privacy === "private" && (
 							<div className="grid gap-3 rounded-md border border-border/60 bg-muted/30 p-3">
 								<div className="space-y-2">
-									<Label htmlFor="workspace-journal-password">{t("journal.password")}</Label>
+									<Label htmlFor="workspace-journal-password">
+										{t("journal.password")}
+									</Label>
 									<PasswordInput
 										id="workspace-journal-password"
 										placeholder={t("journal.passwordPlaceholder")}
@@ -321,7 +489,9 @@ export function JournalWorkspace({
 									/>
 								</div>
 								<div className="space-y-2">
-									<Label htmlFor="workspace-journal-confirm">{t("journal.confirmPassword")}</Label>
+									<Label htmlFor="workspace-journal-confirm">
+										{t("journal.confirmPassword")}
+									</Label>
 									<PasswordInput
 										id="workspace-journal-confirm"
 										placeholder={t("journal.passwordPlaceholder")}
@@ -331,8 +501,7 @@ export function JournalWorkspace({
 								</div>
 							</div>
 						)}
-						
-						{/* Title Required Option */}
+
 						<div className="border-t border-border/50 pt-4">
 							<div className="flex items-start gap-3">
 								<Checkbox
@@ -342,11 +511,17 @@ export function JournalWorkspace({
 									className="mt-1"
 								/>
 								<div className="flex-1">
-									<Label htmlFor="title-required" className="text-sm font-medium cursor-pointer">
+									<Label
+										htmlFor="title-required"
+										className="text-sm font-medium cursor-pointer"
+									>
 										{t("journal.titleRequired", "Título requerido")}
 									</Label>
 									<p className="text-xs text-muted-foreground mt-1">
-										{t("journal.titleRequiredDescription", "Requerir que las entradas tengan un título.")}
+										{t(
+											"journal.titleRequiredDescription",
+											"Requerir que las entradas tengan un título."
+										)}
 									</p>
 								</div>
 							</div>
@@ -364,7 +539,9 @@ export function JournalWorkspace({
 								(privacy === "private" && (!password || password !== confirmPassword))
 							}
 						>
-							{creating ? t("menu.creating", "Creando...") : t("journal.create", "Crear diario")}
+							{creating
+								? t("menu.creating", "Creando...")
+								: t("journal.create", "Crear diario")}
 						</Button>
 					</DialogFooter>
 				</DialogContent>
@@ -374,7 +551,12 @@ export function JournalWorkspace({
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>{t("menu.shortcuts", "Atajos de teclado")}</DialogTitle>
-						<DialogDescription>{t("menu.shortcutsDescription", "Combinaciones rápidas para escribir más fluido.")}</DialogDescription>
+						<DialogDescription>
+							{t(
+								"menu.shortcutsDescription",
+								"Combinaciones rápidas para escribir más fluido."
+							)}
+						</DialogDescription>
 					</DialogHeader>
 					<div className="grid gap-2 text-sm text-muted-foreground">
 						<p>Ctrl+S · {t("menu.saveEntry", "Guardar entrada")}</p>
@@ -388,6 +570,6 @@ export function JournalWorkspace({
 			</Dialog>
 
 			<SettingsDialog open={showSettings} onOpenChange={setShowSettings} />
-		</SidebarProvider>
+		</>
 	);
 }

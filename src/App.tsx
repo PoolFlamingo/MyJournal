@@ -42,7 +42,7 @@ function App() {
 
 	if (journal.view === "workspace" && journal.activeJournal) {
 		return (
-			<main className="min-h-screen bg-background">
+			<main className="h-screen overflow-hidden bg-background">
 				{errorOverlay}
 				<JournalWorkspace
 					journals={journal.journals}

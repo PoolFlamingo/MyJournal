@@ -70,7 +70,10 @@ function renderReadOnlyContent(content: string): React.ReactNode {
 			if (node.type === "bulletList" || node.type === "orderedList") {
 				const isOrdered = node.type === "orderedList";
 				return (
-					<ul key={idx} className={`mb-4 ${isOrdered ? "list-decimal" : "list-disc"} list-inside text-foreground`}>
+					<ul
+						key={idx}
+						className={`mb-4 ${isOrdered ? "list-decimal" : "list-disc"} list-inside text-foreground`}
+					>
 						{node.content?.map((item: any, i: number) => (
 							<li key={i} className="mb-1">
 								{item.content?.map((mark: any) => mark.text).join("")}
@@ -80,9 +83,15 @@ function renderReadOnlyContent(content: string): React.ReactNode {
 				);
 			}
 			if (node.type === "blockquote") {
-				const text = node.content?.map((para: any) => para.content?.map((mark: any) => mark.text).join("")).join(" ") || "";
+				const text =
+					node.content
+						?.map((para: any) => para.content?.map((mark: any) => mark.text).join(""))
+						.join(" ") || "";
 				return (
-					<blockquote key={idx} className="mb-4 border-l-4 border-primary pl-4 italic text-muted-foreground">
+					<blockquote
+						key={idx}
+						className="mb-4 border-l-4 border-primary pl-4 italic text-muted-foreground"
+					>
 						{text}
 					</blockquote>
 				);
@@ -152,7 +161,9 @@ export function EntryEditor({
 			Image,
 			TextAlign.configure({ types: ["heading", "paragraph"] }),
 			Highlight,
-			Placeholder.configure({ placeholder: t("entry.editorPlaceholder", "Empieza a escribir...") }),
+			Placeholder.configure({
+				placeholder: t("entry.editorPlaceholder", "Empieza a escribir..."),
+			}),
 			TaskList,
 			TaskItem.configure({ nested: true }),
 			CodeBlockLowlight.configure({ lowlight }),
@@ -172,9 +183,10 @@ export function EntryEditor({
 		},
 		editorProps: {
 			attributes: {
-				class: "prose prose-slate dark:prose-invert prose-p:leading-relaxed prose-headings:font-bold prose-a:text-primary max-w-none focus:outline-none min-h-[400px]",
+				class:
+					"prose prose-slate dark:prose-invert prose-p:leading-relaxed prose-headings:font-bold prose-a:text-primary max-w-none focus:outline-none min-h-[400px]",
 			},
-		}
+		},
 	});
 
 	// Sync editor content + title when entry/date changes
@@ -196,7 +208,7 @@ export function EntryEditor({
 		// Validate title requirement
 		const hasContent = editor && !editor.isEmpty;
 		const hasTitle = title.trim().length > 0;
-		
+
 		if (titleRequired && !hasTitle) return; // Title is required
 		if (!hasTitle && !hasContent) return; // Must have either title or content
 
@@ -267,29 +279,37 @@ export function EntryEditor({
 				void handleSave();
 			}
 		},
-		[handleSave],
+		[handleSave]
 	);
 
-	const formattedDate = new Date(selectedDate + "T12:00:00").toLocaleDateString(undefined, {
-		weekday: "long",
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
+	const formattedDate = new Date(selectedDate + "T12:00:00").toLocaleDateString(
+		undefined,
+		{
+			weekday: "long",
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		}
+	);
 
 	if (loading) {
 		return (
 			<div className="flex absolute inset-0 items-center justify-center bg-background/50 backdrop-blur-sm z-10">
 				<div className="flex flex-col items-center gap-4 text-primary">
 					<Loader2 className="size-10 animate-spin text-primary" />
-					<p className="text-sm font-medium animate-pulse">{t("common.loading", "Cargando...")}</p>
+					<p className="text-sm font-medium animate-pulse">
+						{t("common.loading", "Cargando...")}
+					</p>
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="flex flex-col h-full bg-background overflow-hidden" onKeyDown={isEditMode ? handleKeyDown : undefined}>
+		<div
+			className="flex flex-col h-full bg-background overflow-hidden"
+			onKeyDown={isEditMode ? handleKeyDown : undefined}
+		>
 			{/* Top Actions Bar */}
 			<div className="flex items-center justify-between px-6 py-4 bg-background z-20">
 				<div className="flex items-center gap-2">
@@ -329,7 +349,12 @@ export function EntryEditor({
 								<Button
 									size="sm"
 									onClick={() => void handleSave()}
-									disabled={saving || (titleRequired ? !title.trim() : !title.trim() && (!editor || editor.isEmpty))}
+									disabled={
+										saving ||
+										(titleRequired
+											? !title.trim()
+											: !title.trim() && (!editor || editor.isEmpty))
+									}
 									className="h-8 rounded-lg font-medium tracking-wide shadow-sm"
 								>
 									{saving ? (
@@ -337,7 +362,9 @@ export function EntryEditor({
 									) : (
 										<Save className="mr-2 size-4" />
 									)}
-									{saving ? t("entry.saving", "Guardando...") : t("entry.saveBtn", "Guardar")}
+									{saving
+										? t("entry.saving", "Guardando...")
+										: t("entry.saveBtn", "Guardar")}
 								</Button>
 							</div>
 						</>
@@ -369,13 +396,16 @@ export function EntryEditor({
 			<div className="flex-1 px-8 pb-8 overflow-y-auto">
 				<div className="mx-auto max-w-4xl min-h-full flex flex-col bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden ring-1 ring-border/5">
 					{isEditMode ? (
-						<>
+						<div
+							key="edit"
+							className="flex flex-col flex-1 animate-in fade-in-0 duration-200"
+						>
 							{editor && (
 								<div className="border-b border-border/40 bg-muted/10">
 									<EditorToolbar editor={editor} />
 								</div>
 							)}
-							
+
 							<div className="flex flex-col flex-1 p-8 md:p-12">
 								<TextareaAutosize
 									placeholder={t("entry.titlePlaceholder", "¿Qué quieres escribir hoy?")}
@@ -383,21 +413,32 @@ export function EntryEditor({
 									onChange={handleTitleChange}
 									className="w-full bg-transparent border-none text-4xl md:text-5xl font-extrabold focus:outline-none placeholder:text-muted-foreground/20 mb-8 resize-none leading-tight tracking-tight"
 								/>
-								
+
 								<div className="flex-1">
 									<EditorContent editor={editor} />
 								</div>
 							</div>
-						</>
+						</div>
 					) : (
 						// Read-only view
-						<div className="flex flex-col flex-1 p-8 md:p-12">
-							<h1 className="text-4xl md:text-5xl font-extrabold mb-8 text-foreground leading-tight tracking-tight">
-								{title || t("entry.noTitle", "Sin título")}
-							</h1>
-							
+						<div
+							key="view"
+							className="flex flex-col flex-1 p-8 md:p-12 animate-in fade-in-0 duration-200"
+						>
+							{title && (
+								<h1 className="text-4xl md:text-5xl font-extrabold mb-8 text-foreground leading-tight tracking-tight">
+									{title}
+								</h1>
+							)}
+
 							<div className="flex-1">
-								{entry?.content ? renderReadOnlyContent(entry.content) : <p className="text-muted-foreground">{t("entry.noEntry", "No hay contenido")}</p>}
+								{entry?.content ? (
+									renderReadOnlyContent(entry.content)
+								) : (
+									<p className="text-muted-foreground">
+										{t("entry.noEntry", "No hay contenido")}
+									</p>
+								)}
 							</div>
 						</div>
 					)}

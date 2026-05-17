@@ -14,7 +14,8 @@
 		"calendar": "Calendario",
 		"newJournal": "Nuevo diario",
 		"settings": "Ajustes",
-		"workspace": "Espacio de trabajo"
+		"workspace": "Espacio de trabajo",
+		"toggle": "Mostrar / ocultar barra lateral"
 	},
 	"journal": {
 		"name": "Nombre del diario",
@@ -64,7 +65,6 @@
 		"delete": "Eliminar entrada",
 		"deleteConfirm": "¿Estás seguro de que quieres eliminar esta entrada?",
 		"edit": "Editar",
-		"noTitle": "Sin título",
 		"noEntry": "No hay ninguna entrada para este día.",
 		"createEntry": "Crear entrada",
 		"editorPlaceholder": "Empieza a escribir..."

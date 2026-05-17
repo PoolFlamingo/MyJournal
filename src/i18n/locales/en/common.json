@@ -1,19 +1,21 @@
 {
-  "title": "My Journal",
-  "subtitle": "Your personal journal",
-  "footer": "Tauri + React + Bun + SQLite",
-  "theme": {
-    "change": "Change theme",
-    "light": "Light",
-    "dark": "Dark",
-    "system": "System"
-  },
-  "language": {
-    "label": "Language",
-    "es": "Español",
-    "en": "English"
-  },
-  "errors": {
-    "loadFailed": "Failed to load tasks"
-  }
+	"title": "My Journal",
+	"subtitle": "Your personal journal",
+	"footer": "Tauri + React + Bun + SQLite",
+	"theme": {
+		"change": "Change theme",
+		"light": "Light",
+		"dark": "Dark",
+		"system": "System",
+		"toggleToLight": "Switch to light theme",
+		"toggleToDark": "Switch to dark theme"
+	},
+	"language": {
+		"label": "Language",
+		"es": "Español",
+		"en": "English"
+	},
+	"errors": {
+		"loadFailed": "Failed to load tasks"
+	}
 }
