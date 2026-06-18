@@ -8,10 +8,18 @@ import {
   DayPicker,
   getDefaultClassNames,
   type DayButton,
+  type DropdownProps,
 } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 function Calendar({
   className,
@@ -161,6 +169,7 @@ function Calendar({
           )
         },
         DayButton: CalendarDayButton,
+        Dropdown: CalendarDropdown,
         WeekNumber: ({ children, ...props }) => {
           return (
             <td {...props}>
@@ -174,6 +183,42 @@ function Calendar({
       }}
       {...props}
     />
+  )
+}
+
+function CalendarDropdown({
+  value,
+  onChange,
+  options,
+  "aria-label": ariaLabel,
+}: DropdownProps) {
+  const handleValueChange = (newValue: string) => {
+    onChange?.({
+      target: { value: newValue },
+    } as unknown as React.ChangeEvent<HTMLSelectElement>)
+  }
+
+  return (
+    <Select value={value?.toString()} onValueChange={handleValueChange}>
+      <SelectTrigger
+        size="sm"
+        aria-label={ariaLabel}
+        className="h-7 gap-1 border-input px-2 text-sm font-medium [&_svg]:size-3.5"
+      >
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent className="max-h-72">
+        {options?.map((option) => (
+          <SelectItem
+            key={option.value}
+            value={option.value.toString()}
+            disabled={option.disabled}
+          >
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }
 

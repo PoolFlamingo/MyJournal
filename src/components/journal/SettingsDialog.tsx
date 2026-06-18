@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Package, Palette, Globe, RefreshCw, Download, RotateCcw } from "lucide-react";
+import { motion } from "motion/react";
+import {
+	Package,
+	Palette,
+	Globe,
+	RefreshCw,
+	Download,
+	RotateCcw,
+	Check,
+	Type,
+} from "lucide-react";
 import {
 	Dialog,
 	DialogContent,
@@ -16,6 +26,7 @@ import { useLanguage } from "@/components/language-provider";
 import { useUpdate } from "@/components/update-provider";
 import { useThemePreset } from "@/hooks/useThemePreset";
 import { useWeekStart } from "@/hooks/useWeekStart";
+import { FontPicker } from "./FontPicker";
 import {
 	Select,
 	SelectContent,
@@ -32,9 +43,15 @@ interface SettingsDialogProps {
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 	const { t } = useTranslation(["journal", "common"]);
-	const { theme, setTheme } = useTheme();
+	const { theme, resolvedTheme, setTheme } = useTheme();
 	const { language, setLanguage, supportedLanguages } = useLanguage();
-	const { loadTheme, getSavedPreset, availablePresets, getDisplayName } = useThemePreset();
+	const {
+		loadTheme,
+		getSavedPreset,
+		availablePresets,
+		getDisplayName,
+		getPreviewColors,
+	} = useThemePreset();
 	const { weekStart, setWeekStart } = useWeekStart();
 	const update = useUpdate();
 	const [selectedTheme, setSelectedTheme] = useState<string | undefined>(() => {
@@ -44,25 +61,38 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-lg">
+			<DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
 				<DialogHeader>
-					<DialogTitle className="text-2xl">{t("journal:menu.settings", "Configuración")}</DialogTitle>
-					<DialogDescription>{t("journal:menu.settingsDescription", "Personaliza tu experiencia en My Journal.")}</DialogDescription>
+					<DialogTitle className="text-2xl">
+						{t("journal:menu.settings", "Configuración")}
+					</DialogTitle>
+					<DialogDescription>
+						{t(
+							"journal:menu.settingsDescription",
+							"Personaliza tu experiencia en My Journal."
+						)}
+					</DialogDescription>
 				</DialogHeader>
 
 				<Tabs defaultValue="appearance" className="w-full">
 					<TabsList className="grid w-full grid-cols-3">
 						<TabsTrigger value="appearance" className="flex items-center gap-2">
 							<Palette className="size-4" />
-							<span className="hidden sm:inline">{t("journal:menu.appearance", "Apariencia")}</span>
+							<span className="hidden sm:inline">
+								{t("journal:menu.appearance", "Apariencia")}
+							</span>
 						</TabsTrigger>
 						<TabsTrigger value="language" className="flex items-center gap-2">
 							<Globe className="size-4" />
-							<span className="hidden sm:inline">{t("journal:menu.languageTab", "Idioma")}</span>
+							<span className="hidden sm:inline">
+								{t("journal:menu.languageTab", "Idioma")}
+							</span>
 						</TabsTrigger>
 						<TabsTrigger value="about" className="flex items-center gap-2">
 							<Package className="size-4" />
-							<span className="hidden sm:inline">{t("journal:menu.about", "Acerca de")}</span>
+							<span className="hidden sm:inline">
+								{t("journal:menu.about", "Acerca de")}
+							</span>
 						</TabsTrigger>
 					</TabsList>
 
@@ -71,21 +101,38 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 						<div className="space-y-6">
 							{/* Light/Dark Mode */}
 							<div>
-								<Label htmlFor="brightness-select" className="text-base font-semibold mb-3 block">
+								<Label
+									htmlFor="brightness-select"
+									className="text-base font-semibold mb-3 block"
+								>
 									{t("journal:menu.brightness", "Modo")}
 								</Label>
-								<Select value={theme} onValueChange={(value) => setTheme(value as "dark" | "light" | "system")}>
+								<Select
+									value={theme}
+									onValueChange={(value) =>
+										setTheme(value as "dark" | "light" | "system")
+									}
+								>
 									<SelectTrigger id="brightness-select">
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value="light">{t("journal:menu.themeLight", "Claro")}</SelectItem>
-										<SelectItem value="dark">{t("journal:menu.themeDark", "Oscuro")}</SelectItem>
-										<SelectItem value="system">{t("journal:menu.themeSystem", "Sistema")}</SelectItem>
+										<SelectItem value="light">
+											{t("journal:menu.themeLight", "Claro")}
+										</SelectItem>
+										<SelectItem value="dark">
+											{t("journal:menu.themeDark", "Oscuro")}
+										</SelectItem>
+										<SelectItem value="system">
+											{t("journal:menu.themeSystem", "Sistema")}
+										</SelectItem>
 									</SelectContent>
 								</Select>
 								<p className="text-sm text-muted-foreground mt-2">
-									{t("journal:menu.brightnessDescription", "Elige si prefieres tema claro, oscuro o seguir la preferencia del sistema.")}
+									{t(
+										"journal:menu.brightnessDescription",
+										"Elige si prefieres tema claro, oscuro o seguir la preferencia del sistema."
+									)}
 								</p>
 							</div>
 
@@ -95,46 +142,116 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 									{t("journal:menu.colorTheme", "Paleta de colores")}
 								</Label>
 								<p className="text-sm text-muted-foreground mb-4">
-									{t("journal:menu.selectTheme", "Elige un tema predefinido para personalizar tu experiencia.")}
+									{t(
+										"journal:menu.selectTheme",
+										"Elige un tema predefinido para personalizar tu experiencia."
+									)}
 								</p>
-								<div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-									{availablePresets.map((preset) => (
-										<button
-											key={preset}
-											onClick={() => {
-												setSelectedTheme(preset);
-												void loadTheme(preset);
-											}}
-											className={cn(
-												"rounded-lg border-2 px-4 py-3 text-sm font-medium transition-all",
-												selectedTheme === preset
-													? "border-primary bg-primary/10 text-primary"
-													: "border-border/50 bg-muted/20 text-muted-foreground hover:border-primary/50 hover:bg-muted/40"
-											)}
-											title={getDisplayName(preset)}
-										>
-											{getDisplayName(preset)}
-										</button>
-									))}
+								<div className="grid max-h-[220px] grid-cols-2 gap-2 overflow-y-auto pr-1 md:grid-cols-3">
+									{availablePresets.map((preset) => {
+										const colors = getPreviewColors(preset, resolvedTheme);
+										const active = selectedTheme === preset;
+										return (
+											<motion.button
+												key={preset}
+												type="button"
+												whileHover={{ scale: 1.03 }}
+												whileTap={{ scale: 0.96 }}
+												transition={{ type: "spring", stiffness: 400, damping: 25 }}
+												onClick={() => {
+													setSelectedTheme(preset);
+													void loadTheme(preset);
+												}}
+												title={getDisplayName(preset)}
+												className={cn(
+													"group flex flex-col gap-1.5 rounded-lg border-2 p-1.5 text-left transition-colors",
+													active
+														? "border-primary ring-2 ring-primary/20"
+														: "border-border/50 hover:border-primary/40 hover:bg-muted/30"
+												)}
+											>
+												<div
+													className="flex h-10 items-center gap-1 overflow-hidden rounded-md border px-2"
+													style={{
+														background: colors.background,
+														borderColor: colors.border,
+													}}
+												>
+													<span
+														className="flex size-6 items-center justify-center rounded text-[11px] font-bold"
+														style={{ background: colors.card, color: colors.foreground }}
+													>
+														Aa
+													</span>
+													<span
+														className="size-3 rounded-full"
+														style={{ background: colors.primary }}
+													/>
+													<span
+														className="size-3 rounded-full"
+														style={{ background: colors.secondary }}
+													/>
+													<span
+														className="size-3 rounded-full"
+														style={{ background: colors.accent }}
+													/>
+												</div>
+												<span className="flex items-center justify-between gap-1 px-0.5">
+													<span className="truncate text-xs font-medium">
+														{getDisplayName(preset)}
+													</span>
+													{active && <Check className="size-3.5 shrink-0 text-primary" />}
+												</span>
+											</motion.button>
+										);
+									})}
 								</div>
+							</div>
+
+							{/* Editor Typography */}
+							<div className="border-t border-border/40 pt-4">
+								<Label className="text-base font-semibold mb-3 flex items-center gap-2">
+									<Type className="size-4" />
+									{t("journal:menu.editorFont", "Fuente por defecto del editor")}
+								</Label>
+								<p className="text-sm text-muted-foreground mb-3">
+									{t(
+										"journal:menu.editorFontDescription",
+										"Elige la fuente con la que se muestran todas tus entradas. Puedes elegir cualquiera de la lista o subir la tuya (.ttf, .otf, .woff, .woff2)."
+									)}
+								</p>
+								<FontPicker />
 							</div>
 
 							{/* Week Start */}
 							<div className="border-t border-border/40 pt-4">
-								<Label htmlFor="week-start-select" className="text-base font-semibold mb-3 block">
+								<Label
+									htmlFor="week-start-select"
+									className="text-base font-semibold mb-3 block"
+								>
 									{t("journal:settings.weekStart", "Inicio de la semana")}
 								</Label>
-								<Select value={weekStart.toString()} onValueChange={(value) => setWeekStart(value === "0" ? 0 : 1)}>
+								<Select
+									value={weekStart.toString()}
+									onValueChange={(value) => setWeekStart(value === "0" ? 0 : 1)}
+								>
 									<SelectTrigger id="week-start-select">
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent>
-										<SelectItem value="0">{t("journal:settings.weekStartSunday", "Domingo")}</SelectItem>
-										<SelectItem value="1">{t("journal:settings.weekStartMonday", "Lunes")}</SelectItem>
+										<SelectItem value="0">
+											{t("journal:settings.weekStartSunday", "Domingo")}
+										</SelectItem>
+										<SelectItem value="1">
+											{t("journal:settings.weekStartMonday", "Lunes")}
+										</SelectItem>
 									</SelectContent>
 								</Select>
 								<p className="text-sm text-muted-foreground mt-2">
-									{t("journal:settings.weekStartDescription", "Elige si la semana comienza el domingo o el lunes.")}
+									{t(
+										"journal:settings.weekStartDescription",
+										"Elige si la semana comienza el domingo o el lunes."
+									)}
 								</p>
 							</div>
 						</div>
@@ -146,7 +263,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 							<Label htmlFor="language-select" className="text-base font-semibold">
 								{t("journal:menu.language", "Idioma")}
 							</Label>
-							<Select value={language} onValueChange={(value) => void setLanguage(value as "es" | "en")}>
+							<Select
+								value={language}
+								onValueChange={(value) => void setLanguage(value as "es" | "en")}
+							>
 								<SelectTrigger id="language-select">
 									<SelectValue />
 								</SelectTrigger>
@@ -159,7 +279,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 								</SelectContent>
 							</Select>
 							<p className="text-sm text-muted-foreground">
-								{t("journal:menu.languageDescription", "Selecciona el idioma de la interfaz.")}
+								{t(
+									"journal:menu.languageDescription",
+									"Selecciona el idioma de la interfaz."
+								)}
 							</p>
 						</div>
 					</TabsContent>
@@ -170,17 +293,29 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 							<div className="rounded-lg border border-border/50 bg-muted/30 p-4">
 								<h3 className="font-semibold text-foreground mb-2">My Journal</h3>
 								<p className="text-sm text-muted-foreground mb-3">
-									{t("journal:menu.aboutDescription", "Una aplicación de diario personal para reflexionar y proteger tus pensamientos.")}
+									{t(
+										"journal:menu.aboutDescription",
+										"Una aplicación de diario personal para reflexionar y proteger tus pensamientos."
+									)}
 								</p>
 								<div className="space-y-1 text-xs text-muted-foreground">
 									<p>
-										<span className="font-medium text-foreground">{t("journal:menu.versionLabel")}:</span> {update.currentVersion}
+										<span className="font-medium text-foreground">
+											{t("journal:menu.versionLabel")}:
+										</span>{" "}
+										{update.currentVersion}
 									</p>
 									<p>
-										<span className="font-medium text-foreground">{t("journal:menu.technologyLabel")}:</span> Tauri + React + TypeScript
+										<span className="font-medium text-foreground">
+											{t("journal:menu.technologyLabel")}:
+										</span>{" "}
+										Tauri + React + TypeScript
 									</p>
 									<p>
-										<span className="font-medium text-foreground">{t("journal:menu.storageLabel")}:</span> {t("journal:menu.storageValue")}
+										<span className="font-medium text-foreground">
+											{t("journal:menu.storageLabel")}:
+										</span>{" "}
+										{t("journal:menu.storageValue")}
 									</p>
 								</div>
 							</div>
@@ -193,7 +328,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
 								{/* Update status */}
 								{update.error && (
-									<p className="text-xs text-destructive cursor-pointer" onClick={update.dismissError}>
+									<p
+										className="text-xs text-destructive cursor-pointer"
+										onClick={update.dismissError}
+									>
 										{t("journal:settings.updateError")}: {update.error}
 									</p>
 								)}
@@ -201,7 +339,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 								{update.downloaded && update.availableVersion && (
 									<div className="space-y-2">
 										<p className="text-xs text-emerald-600 dark:text-emerald-400">
-											{t("journal:settings.readyToInstallDescription", { version: update.availableVersion })}
+											{t("journal:settings.readyToInstallDescription", {
+												version: update.availableVersion,
+											})}
 										</p>
 										<Button
 											size="sm"
@@ -217,7 +357,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 								{!update.downloaded && update.availableVersion && !update.downloading && (
 									<div className="space-y-2">
 										<p className="text-xs text-amber-600 dark:text-amber-400">
-											{t("journal:settings.updateAvailableDescription", { version: update.availableVersion })}
+											{t("journal:settings.updateAvailableDescription", {
+												version: update.availableVersion,
+											})}
 										</p>
 										<Button
 											size="sm"
@@ -240,7 +382,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 											<div className="h-1.5 w-full rounded-full bg-muted">
 												<div
 													className="h-1.5 rounded-full bg-primary transition-all"
-													style={{ width: `${Math.round((update.progress.downloaded / update.progress.contentLength) * 100)}%` }}
+													style={{
+														width: `${Math.round((update.progress.downloaded / update.progress.contentLength) * 100)}%`,
+													}}
 												/>
 											</div>
 										)}
@@ -261,7 +405,9 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 									onClick={() => void update.checkNow()}
 									className="gap-2"
 								>
-									<RefreshCw className={cn("size-3", update.checking && "animate-spin")} />
+									<RefreshCw
+										className={cn("size-3", update.checking && "animate-spin")}
+									/>
 									{update.checking
 										? t("journal:settings.checking")
 										: t("journal:settings.checkForUpdates")}
@@ -269,16 +415,28 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
 								{/* Update mode selector */}
 								<div className="border-t border-border/40 pt-3">
-									<Label htmlFor="update-mode-select" className="text-xs font-medium mb-2 block">
+									<Label
+										htmlFor="update-mode-select"
+										className="text-xs font-medium mb-2 block"
+									>
 										{t("journal:settings.updateMode")}
 									</Label>
-									<Select value={update.mode} onValueChange={(value) => void update.setMode(value as "notify" | "background")}>
+									<Select
+										value={update.mode}
+										onValueChange={(value) =>
+											void update.setMode(value as "notify" | "background")
+										}
+									>
 										<SelectTrigger id="update-mode-select" className="h-8 text-xs">
 											<SelectValue />
 										</SelectTrigger>
 										<SelectContent>
-											<SelectItem value="notify">{t("journal:settings.updateModeNotify")}</SelectItem>
-											<SelectItem value="background">{t("journal:settings.updateModeBackground")}</SelectItem>
+											<SelectItem value="notify">
+												{t("journal:settings.updateModeNotify")}
+											</SelectItem>
+											<SelectItem value="background">
+												{t("journal:settings.updateModeBackground")}
+											</SelectItem>
 										</SelectContent>
 									</Select>
 									<p className="text-xs text-muted-foreground mt-1">

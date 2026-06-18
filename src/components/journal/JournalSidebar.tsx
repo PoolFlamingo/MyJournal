@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "motion/react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitch } from "@/components/language-switch";
@@ -18,6 +19,19 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
+const journalListContainer = {
+	hidden: {},
+	show: { transition: { staggerChildren: 0.04 } },
+};
+const journalListItem = {
+	hidden: { opacity: 0, x: -8 },
+	show: {
+		opacity: 1,
+		x: 0,
+		transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] as const },
+	},
+};
 
 interface JournalSidebarProps {
 	journals: JournalSummary[];
@@ -154,11 +168,20 @@ export function JournalSidebar({
 							<Plus className="size-3.5" />
 						</Button>
 					</div>
-					<ul className="mt-2 space-y-1">
+					<motion.ul
+						className="mt-2 space-y-1"
+						variants={journalListContainer}
+						initial="hidden"
+						animate="show"
+					>
 						{journals.map((journal) => {
 							const isActive = journal.id === activeJournalId;
 							return (
-								<li key={journal.id} className="group/item relative flex items-center">
+								<motion.li
+									key={journal.id}
+									variants={journalListItem}
+									className="group/item relative flex items-center"
+								>
 									<button
 										onClick={() => onOpenJournal(journal.id)}
 										className={cn(
@@ -218,10 +241,10 @@ export function JournalSidebar({
 									>
 										<Trash2 className="size-3.5" />
 									</button>
-								</li>
+								</motion.li>
 							);
 						})}
-					</ul>
+					</motion.ul>
 				</div>
 			</div>
 

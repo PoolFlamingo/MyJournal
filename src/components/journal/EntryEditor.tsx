@@ -12,6 +12,8 @@ import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import CharacterCount from "@tiptap/extension-character-count";
+import TextStyle from "@tiptap/extension-text-style";
+import FontFamily from "@tiptap/extension-font-family";
 import { Table } from "@tiptap/extension-table";
 import { TableRow } from "@tiptap/extension-table-row";
 import { TableHeader } from "@tiptap/extension-table-header";
@@ -32,82 +34,6 @@ function parseContent(content: string): object | string {
 	} catch {
 		// Legacy plain-text fallback
 		return content;
-	}
-}
-
-function renderReadOnlyContent(content: string): React.ReactNode {
-	if (!content) return null;
-	try {
-		const parsed = JSON.parse(content) as any;
-		if (!parsed.content || !Array.isArray(parsed.content)) {
-			return <p className="text-foreground">{content}</p>;
-		}
-
-		return parsed.content.map((node: any, idx: number) => {
-			if (node.type === "paragraph") {
-				const text = node.content?.map((mark: any) => mark.text).join("") || "";
-				return (
-					<p key={idx} className="mb-4 text-foreground">
-						{text}
-					</p>
-				);
-			}
-			if (node.type === "heading") {
-				const level = (node.attrs?.level || 2) as number;
-				const text = node.content?.map((mark: any) => mark.text).join("") || "";
-				const classMap: Record<number, string> = {
-					1: "text-2xl font-bold mb-4",
-					2: "text-xl font-bold mb-3",
-					3: "text-lg font-bold mb-3",
-				};
-				const className = classMap[level] || "text-lg font-bold mb-3";
-				return (
-					<div key={idx} className={className}>
-						{text}
-					</div>
-				);
-			}
-			if (node.type === "bulletList" || node.type === "orderedList") {
-				const isOrdered = node.type === "orderedList";
-				return (
-					<ul
-						key={idx}
-						className={`mb-4 ${isOrdered ? "list-decimal" : "list-disc"} list-inside text-foreground`}
-					>
-						{node.content?.map((item: any, i: number) => (
-							<li key={i} className="mb-1">
-								{item.content?.map((mark: any) => mark.text).join("")}
-							</li>
-						))}
-					</ul>
-				);
-			}
-			if (node.type === "blockquote") {
-				const text =
-					node.content
-						?.map((para: any) => para.content?.map((mark: any) => mark.text).join(""))
-						.join(" ") || "";
-				return (
-					<blockquote
-						key={idx}
-						className="mb-4 border-l-4 border-primary pl-4 italic text-muted-foreground"
-					>
-						{text}
-					</blockquote>
-				);
-			}
-			if (node.type === "codeBlock") {
-				const text = node.content?.map((mark: any) => mark.text).join("") || "";
-				return (
-					<pre key={idx} className="mb-4 bg-muted p-4 rounded overflow-auto text-sm">
-						<code className="text-foreground">{text}</code>
-					</pre>
-				);
-			}
-			return null;
-		});
-	} catch {
-		return <p className="text-foreground">{content}</p>;
 	}
 }
 
@@ -168,6 +94,8 @@ export function EntryEditor({
 			TaskItem.configure({ nested: true }),
 			CodeBlockLowlight.configure({ lowlight }),
 			CharacterCount,
+			TextStyle,
+			FontFamily.configure({ types: ["textStyle"] }),
 			Table.configure({ resizable: true }),
 			TableRow,
 			TableHeader,
@@ -198,6 +126,12 @@ export function EntryEditor({
 			editor.commands.setContent(parseContent(entry?.content ?? ""), false);
 		}
 	}, [entry, selectedDate, editor]);
+
+	// Toggle the editor's editability so the read-only view renders identically
+	// to editing (same TipTap output: fonts, images, tables…) but can't be edited.
+	useEffect(() => {
+		editor?.setEditable(isEditMode);
+	}, [editor, isEditMode]);
 
 	const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setTitle(e.target.value);
@@ -392,56 +326,35 @@ export function EntryEditor({
 				</div>
 			</div>
 
-			{/* Main Content */}
+			{/* Main Content — the same TipTap editor renders both modes, so the
+			    read-only view looks identical to editing (just not editable). */}
 			<div className="flex-1 px-8 pb-8 overflow-y-auto">
 				<div className="mx-auto max-w-4xl min-h-full flex flex-col bg-card border border-border/60 rounded-xl shadow-sm overflow-hidden ring-1 ring-border/5">
-					{isEditMode ? (
-						<div
-							key="edit"
-							className="flex flex-col flex-1 animate-in fade-in-0 duration-200"
-						>
-							{editor && (
-								<div className="border-b border-border/40 bg-muted/10">
-									<EditorToolbar editor={editor} />
-								</div>
-							)}
-
-							<div className="flex flex-col flex-1 p-8 md:p-12">
-								<TextareaAutosize
-									placeholder={t("entry.titlePlaceholder", "¿Qué quieres escribir hoy?")}
-									value={title}
-									onChange={handleTitleChange}
-									className="w-full bg-transparent border-none text-4xl md:text-5xl font-extrabold focus:outline-none placeholder:text-muted-foreground/20 mb-8 resize-none leading-tight tracking-tight"
-								/>
-
-								<div className="flex-1">
-									<EditorContent editor={editor} />
-								</div>
-							</div>
-						</div>
-					) : (
-						// Read-only view
-						<div
-							key="view"
-							className="flex flex-col flex-1 p-8 md:p-12 animate-in fade-in-0 duration-200"
-						>
-							{title && (
-								<h1 className="text-4xl md:text-5xl font-extrabold mb-8 text-foreground leading-tight tracking-tight">
-									{title}
-								</h1>
-							)}
-
-							<div className="flex-1">
-								{entry?.content ? (
-									renderReadOnlyContent(entry.content)
-								) : (
-									<p className="text-muted-foreground">
-										{t("entry.noEntry", "No hay contenido")}
-									</p>
-								)}
-							</div>
+					{isEditMode && editor && (
+						<div className="border-b border-border/40 bg-muted/10">
+							<EditorToolbar editor={editor} />
 						</div>
 					)}
+
+					<div className="flex flex-col flex-1 p-8 md:p-12 animate-in fade-in-0 duration-200">
+						{(isEditMode || title.trim().length > 0) && (
+							<TextareaAutosize
+								readOnly={!isEditMode}
+								placeholder={
+									isEditMode
+										? t("entry.titlePlaceholder", "¿Qué quieres escribir hoy?")
+										: ""
+								}
+								value={title}
+								onChange={handleTitleChange}
+								className="mj-editor-surface w-full bg-transparent border-none text-4xl md:text-5xl font-extrabold focus:outline-none placeholder:text-muted-foreground/20 mb-8 resize-none leading-tight tracking-tight"
+							/>
+						)}
+
+						<div className="flex-1">
+							<EditorContent editor={editor} />
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

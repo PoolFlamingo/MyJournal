@@ -207,6 +207,15 @@
 	}
 }
 
+/* ── Editor typography ────────────────────────────────────────
+   The writing surface (title, body and read-only render) uses the
+   user-selected editor font. `--editor-font` is set on :root by the
+   EditorFontProvider; it falls back to the active theme's serif. */
+.tiptap,
+.mj-editor-surface {
+	font-family: var(--editor-font, var(--font-serif));
+}
+
 /* ── TipTap editor content styles ─────────────────────────── */
 .tiptap {
 	outline: none;

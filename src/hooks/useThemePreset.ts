@@ -1,44 +1,103 @@
 import { useCallback } from "react";
-import caffeineTheme from "@/assets/themes/caffeine.json";
-import cyberpunkTheme from "@/assets/themes/cyberpunk.json";
-import notebookTheme from "@/assets/themes/notebook.json";
-import omegonTheme from "@/assets/themes/omegon.json";
-import sunsetHorizonTheme from "@/assets/themes/sunset-horizon.json";
-import vintagePaperTheme from "@/assets/themes/vintage-paper.json";
 
-export type ThemePreset = "caffeine" | "cyberpunk" | "notebook" | "omegon" | "sunset-horizon" | "vintage-paper";
+/**
+ * Theme presets are loaded dynamically from every JSON file in
+ * `src/assets/themes/`. Dropping a new tweakcn registry-item JSON into that
+ * folder is enough to make it appear in the palette — no code changes needed.
+ */
+
+export type ThemePreset = string;
+
+type ThemeVars = Record<string, string>;
+type ThemeJson = {
+	name?: string;
+	cssVars?: {
+		theme?: ThemeVars;
+		light?: ThemeVars;
+		dark?: ThemeVars;
+	};
+};
 
 const THEME_STORAGE_KEY = "my-journal-theme-preset";
 const STYLE_ELEMENT_ID = "my-journal-preset-styles";
+const DEFAULT_PRESET = "caffeine";
 
-const AVAILABLE_PRESETS: ThemePreset[] = [
+// Eagerly import every theme JSON. Vite resolves the glob at build time.
+const themeModules = import.meta.glob<{ default: ThemeJson }>("../assets/themes/*.json", {
+	eager: true,
+});
+
+const THEME_DATA: Record<string, ThemeJson> = {};
+for (const [path, mod] of Object.entries(themeModules)) {
+	const slug = path
+		.split("/")
+		.pop()!
+		.replace(/\.json$/, "");
+	THEME_DATA[slug] = mod.default;
+}
+
+// The presets that shipped first stay at the front so the palette feels stable;
+// everything else follows alphabetically.
+const FEATURED_ORDER = [
 	"caffeine",
-	"cyberpunk",
 	"notebook",
+	"vintage-paper",
 	"omegon",
 	"sunset-horizon",
-	"vintage-paper",
+	"cyberpunk",
 ];
 
-const THEME_DISPLAY_NAMES: Record<ThemePreset, string> = {
-	"caffeine": "Caffeine",
-	"cyberpunk": "Cyberpunk",
-	"notebook": "Notebook",
-	"omegon": "Omegon",
-	"sunset-horizon": "Sunset Horizon",
-	"vintage-paper": "Vintage Paper",
-};
+const AVAILABLE_PRESETS: ThemePreset[] = (() => {
+	const all = Object.keys(THEME_DATA);
+	const featured = FEATURED_ORDER.filter((s) => all.includes(s));
+	const rest = all
+		.filter((s) => !featured.includes(s))
+		.sort((a, b) => a.localeCompare(b));
+	return [...featured, ...rest];
+})();
 
-type ThemeJson = typeof caffeineTheme;
+/** "modern-minimal" → "Modern Minimal", "doom-64" → "Doom 64", "t3-chat" → "T3 Chat". */
+function slugToTitle(slug: string): string {
+	return slug
+		.split("-")
+		.map((word) => (word ? word.charAt(0).toUpperCase() + word.slice(1) : word))
+		.join(" ");
+}
 
-const THEME_DATA: Record<ThemePreset, ThemeJson> = {
-	"caffeine": caffeineTheme,
-	"cyberpunk": cyberpunkTheme,
-	"notebook": notebookTheme,
-	"omegon": omegonTheme,
-	"sunset-horizon": sunsetHorizonTheme,
-	"vintage-paper": vintagePaperTheme,
-};
+const THEME_DISPLAY_NAMES: Record<string, string> = Object.fromEntries(
+	AVAILABLE_PRESETS.map((slug) => [slug, slugToTitle(slug)])
+);
+
+export interface PreviewColors {
+	background: string;
+	card: string;
+	foreground: string;
+	primary: string;
+	secondary: string;
+	accent: string;
+	border: string;
+}
+
+const FALLBACK_COLOR = "oklch(0.5 0 0)";
+
+function pick(vars: ThemeVars | undefined, key: string): string {
+	return vars?.[key] ?? FALLBACK_COLOR;
+}
+
+/** Colors used by the palette swatches so a theme can be previewed without applying it. */
+function getPreviewColors(preset: ThemePreset, mode: "light" | "dark"): PreviewColors {
+	const data = THEME_DATA[preset];
+	const vars = (mode === "dark" ? data?.cssVars?.dark : data?.cssVars?.light) ?? {};
+	return {
+		background: pick(vars, "background"),
+		card: pick(vars, "card"),
+		foreground: pick(vars, "foreground"),
+		primary: pick(vars, "primary"),
+		secondary: pick(vars, "secondary"),
+		accent: pick(vars, "accent"),
+		border: pick(vars, "border"),
+	};
+}
 
 function buildVarsBlock(vars: Record<string, string>): string {
 	return Object.entries(vars)
@@ -47,7 +106,7 @@ function buildVarsBlock(vars: Record<string, string>): string {
 }
 
 function applyPreset(preset: ThemePreset): void {
-	const data = THEME_DATA[preset];
+	const data = THEME_DATA[preset] ?? THEME_DATA[DEFAULT_PRESET];
 	if (!data?.cssVars) return;
 
 	// Remove previous preset style element
@@ -57,17 +116,17 @@ function applyPreset(preset: ThemePreset): void {
 
 	// Shared theme-level vars (fonts, radius, etc.) go on :root always
 	if (data.cssVars.theme) {
-		css += `:root {\n${buildVarsBlock(data.cssVars.theme as Record<string, string>)}\n}\n`;
+		css += `:root {\n${buildVarsBlock(data.cssVars.theme)}\n}\n`;
 	}
 
 	// Light mode vars on :root (default)
 	if (data.cssVars.light) {
-		css += `:root {\n${buildVarsBlock(data.cssVars.light as Record<string, string>)}\n}\n`;
+		css += `:root {\n${buildVarsBlock(data.cssVars.light)}\n}\n`;
 	}
 
 	// Dark mode vars under .dark selector so ThemeProvider class wins correctly
 	if (data.cssVars.dark) {
-		css += `.dark {\n${buildVarsBlock(data.cssVars.dark as Record<string, string>)}\n}\n`;
+		css += `.dark {\n${buildVarsBlock(data.cssVars.dark)}\n}\n`;
 	}
 
 	const style = document.createElement("style");
@@ -85,15 +144,15 @@ export function useThemePreset() {
 
 	const getSavedPreset = useCallback((): ThemePreset | null => {
 		const saved = localStorage.getItem(THEME_STORAGE_KEY);
-		if (saved && AVAILABLE_PRESETS.includes(saved as ThemePreset)) {
-			return saved as ThemePreset;
+		if (saved && AVAILABLE_PRESETS.includes(saved)) {
+			return saved;
 		}
 		return null;
 	}, []);
 
 	const applySavedTheme = useCallback(() => {
 		const saved = getSavedPreset();
-		applyPreset(saved ?? "caffeine");
+		applyPreset(saved ?? DEFAULT_PRESET);
 	}, [getSavedPreset]);
 
 	return {
@@ -101,6 +160,8 @@ export function useThemePreset() {
 		getSavedPreset,
 		applySavedTheme,
 		availablePresets: AVAILABLE_PRESETS,
-		getDisplayName: (preset: ThemePreset) => THEME_DISPLAY_NAMES[preset],
+		getDisplayName: (preset: ThemePreset) =>
+			THEME_DISPLAY_NAMES[preset] ?? slugToTitle(preset),
+		getPreviewColors,
 	};
 }

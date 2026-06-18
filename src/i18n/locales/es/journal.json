@@ -97,7 +97,19 @@
 		"linkPrompt": "URL del enlace",
 		"imagePrompt": "URL de la imagen",
 		"tableRows": "Número de filas:",
-		"tableColumns": "Número de columnas:"
+		"tableColumns": "Número de columnas:",
+		"linkTitle": "Insertar enlace",
+		"linkDescription": "Pega o escribe la dirección del enlace.",
+		"linkLabel": "URL",
+		"linkRemove": "Quitar enlace",
+		"imageTitle": "Insertar imagen",
+		"imageDescription": "Introduce la dirección de la imagen.",
+		"imageLabel": "URL de la imagen",
+		"tableTitle": "Insertar tabla",
+		"tableDescription": "Elige el número de filas y columnas.",
+		"rows": "Filas",
+		"columns": "Columnas",
+		"insert": "Insertar"
 	},
 	"menu": {
 		"file": "Archivo",
@@ -150,7 +162,9 @@
 		"versionLabel": "Versión",
 		"technologyLabel": "Tecnología",
 		"storageLabel": "Almacenamiento",
-		"storageValue": "Tauri SQLite"
+		"storageValue": "Tauri SQLite",
+		"editorFont": "Fuente por defecto del editor",
+		"editorFontDescription": "Elige la fuente con la que se muestran todas tus entradas. Puedes elegir cualquiera de la lista o subir la tuya (.ttf, .otf, .woff, .woff2)."
 	},
 	"calendar": {
 		"today": "Hoy",
@@ -233,5 +247,22 @@
 		"deleteFailed": "Error al eliminar",
 		"unlockFailed": "Error al desbloquear el diario",
 		"journalLocked": "Este diario está bloqueado"
+	},
+	"editorFont": {
+		"search": "Buscar fuente...",
+		"empty": "Sin resultados",
+		"custom": "Tus fuentes",
+		"sans": "Sans-serif",
+		"serif": "Serif",
+		"mono": "Monoespaciada",
+		"upload": "Subir fuente...",
+		"uploading": "Subiendo...",
+		"uploadSuccess": "Fuente añadida: {{name}}",
+		"uploadError": "No se pudo añadir la fuente",
+		"deleted": "Fuente eliminada",
+		"deleteError": "No se pudo eliminar la fuente",
+		"delete": "Eliminar fuente",
+		"tooltip": "Fuente del texto",
+		"useDefault": "Predeterminada del editor"
 	}
 }

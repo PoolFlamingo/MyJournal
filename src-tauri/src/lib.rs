@@ -4,6 +4,7 @@ mod state;
 mod types;
 
 use commands::entries::{entry_delete, entry_get_by_date, entry_list_month, entry_save};
+use commands::fonts::{font_delete, font_list, font_read, font_register};
 use commands::journals::{
     app_bootstrap, app_get_setting, app_set_setting, journal_create, journal_delete, journal_list,
     journal_lock, journal_open, journal_rename, journal_unlock,
@@ -39,6 +40,10 @@ pub fn run() {
             entry_save,
             entry_delete,
             entry_list_month,
+            font_register,
+            font_list,
+            font_read,
+            font_delete,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

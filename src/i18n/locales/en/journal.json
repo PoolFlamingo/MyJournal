@@ -97,7 +97,19 @@
 		"linkPrompt": "Link URL",
 		"imagePrompt": "Image URL",
 		"tableRows": "Number of rows:",
-		"tableColumns": "Number of columns:"
+		"tableColumns": "Number of columns:",
+		"linkTitle": "Insert link",
+		"linkDescription": "Paste or type the link address.",
+		"linkLabel": "URL",
+		"linkRemove": "Remove link",
+		"imageTitle": "Insert image",
+		"imageDescription": "Enter the image address.",
+		"imageLabel": "Image URL",
+		"tableTitle": "Insert table",
+		"tableDescription": "Choose the number of rows and columns.",
+		"rows": "Rows",
+		"columns": "Columns",
+		"insert": "Insert"
 	},
 	"menu": {
 		"file": "File",
@@ -150,7 +162,9 @@
 		"versionLabel": "Version",
 		"technologyLabel": "Technology",
 		"storageLabel": "Storage",
-		"storageValue": "Tauri SQLite"
+		"storageValue": "Tauri SQLite",
+		"editorFont": "Default editor font",
+		"editorFontDescription": "Choose the font all your entries are shown in. Pick any from the list or upload your own (.ttf, .otf, .woff, .woff2)."
 	},
 	"calendar": {
 		"today": "Today",
@@ -233,5 +247,22 @@
 		"deleteFailed": "Failed to delete",
 		"unlockFailed": "Failed to unlock journal",
 		"journalLocked": "This journal is locked"
+	},
+	"editorFont": {
+		"search": "Search font...",
+		"empty": "No results",
+		"custom": "Your fonts",
+		"sans": "Sans-serif",
+		"serif": "Serif",
+		"mono": "Monospace",
+		"upload": "Upload font...",
+		"uploading": "Uploading...",
+		"uploadSuccess": "Font added: {{name}}",
+		"uploadError": "Could not add the font",
+		"deleted": "Font removed",
+		"deleteError": "Could not remove the font",
+		"delete": "Remove font",
+		"tooltip": "Text font",
+		"useDefault": "Editor default"
 	}
 }
