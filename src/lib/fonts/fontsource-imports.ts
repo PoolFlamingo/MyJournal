@@ -63,3 +63,24 @@ import "@fontsource/source-code-pro";
 import "@fontsource/ibm-plex-mono";
 import "@fontsource/space-mono";
 import "@fontsource/inconsolata";
+
+/* ── Fonts used by color themes (not offered in the editor picker) ── */
+import "@fontsource/vt323";
+import "@fontsource/alan-sans";
+import "@fontsource/aleo";
+import "@fontsource/antic";
+import "@fontsource/architects-daughter";
+import "@fontsource/basic";
+import "@fontsource/biorhyme";
+import "@fontsource/dm-mono";
+import "@fontsource/geist-sans";
+import "@fontsource/geist-mono";
+import "@fontsource/google-sans-flex";
+import "@fontsource/instrument-serif";
+import "@fontsource/orbitron";
+import "@fontsource/oxanium";
+import "@fontsource/rajdhani";
+import "@fontsource/roboto-mono";
+import "@fontsource/space-grotesk";
+import "@fontsource/tomorrow";
+import "@fontsource/ubuntu-mono";

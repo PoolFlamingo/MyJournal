@@ -156,10 +156,10 @@ export function JournalWorkspace({
 		}
 	};
 
-	// Ctrl/Cmd+B: toggle sidebar (matches previous shadcn Sidebar shortcut).
+	// Ctrl/Cmd+. : toggle sidebar (Ctrl+B is left to the editor for bold).
 	useEffect(() => {
 		const handler = (event: KeyboardEvent) => {
-			if (event.key === "b" && (event.metaKey || event.ctrlKey)) {
+			if (event.key === "." && (event.metaKey || event.ctrlKey)) {
 				event.preventDefault();
 				toggleSidebar();
 			}
@@ -401,9 +401,7 @@ export function JournalWorkspace({
 					defaultLayout={storedLayout}
 					onLayoutChanged={saveLayout}
 					className={
-						panelAnimating
-							? "mj-panel-animating h-screen w-full"
-							: "h-screen w-full"
+						panelAnimating ? "mj-panel-animating h-screen w-full" : "h-screen w-full"
 					}
 				>
 					<ResizablePanel
@@ -560,6 +558,10 @@ export function JournalWorkspace({
 					</DialogHeader>
 					<div className="grid gap-2 text-sm text-muted-foreground">
 						<p>Ctrl+S · {t("menu.saveEntry", "Guardar entrada")}</p>
+						<p>
+							Ctrl+Shift+S · {t("menu.saveKeepEditing", "Guardar sin salir de edición")}
+						</p>
+						<p>Ctrl+. · {t("menu.toggleSidebar", "Mostrar / ocultar barra lateral")}</p>
 						<p>Ctrl+Z · {t("menu.undo", "Deshacer")}</p>
 						<p>Ctrl+Y · {t("menu.redo", "Rehacer")}</p>
 						<p>Ctrl+B · {t("menu.bold", "Negrita")}</p>

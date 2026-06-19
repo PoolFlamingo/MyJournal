@@ -219,6 +219,9 @@
 /* ── TipTap editor content styles ─────────────────────────── */
 .tiptap {
 	outline: none;
+	/* Fill the editor area (flex child) so the writing surface reaches the
+	   bottom and clicking anywhere inside focuses the editor. */
+	flex: 1 1 auto;
 	min-height: 100%;
 }
 .tiptap > * + * {

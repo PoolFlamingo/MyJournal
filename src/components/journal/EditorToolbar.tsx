@@ -14,6 +14,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { FontPicker } from "./FontPicker";
+import { FontSizeControl } from "./FontSizeControl";
 import {
 	Bold,
 	Italic,
@@ -159,8 +160,9 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
 				<Separator orientation="vertical" className="mx-1 h-5" />
 
-				{/* Editor font */}
+				{/* Editor font + size */}
 				<FontPicker compact editor={editor} />
+				<FontSizeControl editor={editor} />
 
 				<Separator orientation="vertical" className="mx-1 h-5" />
 

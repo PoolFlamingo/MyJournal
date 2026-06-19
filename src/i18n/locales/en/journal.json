@@ -164,7 +164,9 @@
 		"storageLabel": "Storage",
 		"storageValue": "Tauri SQLite",
 		"editorFont": "Default editor font",
-		"editorFontDescription": "Choose the font all your entries are shown in. Pick any from the list or upload your own (.ttf, .otf, .woff, .woff2)."
+		"editorFontDescription": "Choose the font all your entries are shown in. Pick any from the list or upload your own (.ttf, .otf, .woff, .woff2).",
+		"saveKeepEditing": "Save without leaving edit mode",
+		"toggleSidebar": "Toggle sidebar"
 	},
 	"calendar": {
 		"today": "Today",
@@ -214,7 +216,11 @@
 			"4": "Th",
 			"5": "Fr",
 			"6": "Sa"
-		}
+		},
+		"prevMonth": "Previous month",
+		"nextMonth": "Next month",
+		"month": "Month",
+		"year": "Year"
 	},
 	"settings": {
 		"weekStart": "Week start",
@@ -264,5 +270,11 @@
 		"delete": "Remove font",
 		"tooltip": "Text font",
 		"useDefault": "Editor default"
+	},
+	"fontSize": {
+		"label": "Text size",
+		"decrease": "Decrease size",
+		"increase": "Increase size",
+		"presets": "Sizes"
 	}
 }

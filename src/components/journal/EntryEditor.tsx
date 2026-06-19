@@ -1,4 +1,4 @@
-﻿import { useState, useCallback, useEffect } from "react";
+﻿import { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -14,6 +14,7 @@ import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import CharacterCount from "@tiptap/extension-character-count";
 import TextStyle from "@tiptap/extension-text-style";
 import FontFamily from "@tiptap/extension-font-family";
+import { FontSize } from "@/lib/tiptap/font-size";
 import { Table } from "@tiptap/extension-table";
 import { TableRow } from "@tiptap/extension-table-row";
 import { TableHeader } from "@tiptap/extension-table-header";
@@ -78,6 +79,9 @@ export function EntryEditor({
 	const [dirty, setDirty] = useState(false);
 	const [editorEpoch, setEditorEpoch] = useState(0);
 	const [isEditMode, setIsEditMode] = useState(!entry); // Start in edit mode only if new entry
+	// When true, the next entry reload (after a save) keeps edit mode instead of
+	// flipping to read-only — used by the "save without leaving edit" shortcut.
+	const keepEditingRef = useRef(false);
 
 	const editor = useEditor({
 		extensions: [
@@ -96,6 +100,7 @@ export function EntryEditor({
 			CharacterCount,
 			TextStyle,
 			FontFamily.configure({ types: ["textStyle"] }),
+			FontSize.configure({ types: ["textStyle"] }),
 			Table.configure({ resizable: true }),
 			TableRow,
 			TableHeader,
@@ -121,7 +126,12 @@ export function EntryEditor({
 	useEffect(() => {
 		setTitle(entry?.title ?? "");
 		setDirty(false);
-		setIsEditMode(!entry); // Start in edit mode only if new entry
+		if (keepEditingRef.current) {
+			// Stay in edit mode after a "save without leaving edit" action.
+			keepEditingRef.current = false;
+		} else {
+			setIsEditMode(!entry); // Start in edit mode only if new entry
+		}
 		if (editor) {
 			editor.commands.setContent(parseContent(entry?.content ?? ""), false);
 		}
@@ -138,27 +148,31 @@ export function EntryEditor({
 		setDirty(true);
 	}, []);
 
-	const handleSave = useCallback(async () => {
-		// Validate title requirement
-		const hasContent = editor && !editor.isEmpty;
-		const hasTitle = title.trim().length > 0;
+	const handleSave = useCallback(
+		async (keepEditing = false) => {
+			// Validate title requirement
+			const hasContent = editor && !editor.isEmpty;
+			const hasTitle = title.trim().length > 0;
 
-		if (titleRequired && !hasTitle) return; // Title is required
-		if (!hasTitle && !hasContent) return; // Must have either title or content
+			if (titleRequired && !hasTitle) return; // Title is required
+			if (!hasTitle && !hasContent) return; // Must have either title or content
 
-		setSaving(true);
-		try {
-			await onSave({
-				journalId,
-				date: selectedDate,
-				title: title.trim(),
-				content: JSON.stringify(editor?.getJSON() || {}),
-			});
-			setDirty(false);
-		} finally {
-			setSaving(false);
-		}
-	}, [journalId, selectedDate, title, editor, onSave, titleRequired]);
+			setSaving(true);
+			try {
+				if (keepEditing) keepEditingRef.current = true;
+				await onSave({
+					journalId,
+					date: selectedDate,
+					title: title.trim(),
+					content: JSON.stringify(editor?.getJSON() || {}),
+				});
+				setDirty(false);
+			} finally {
+				setSaving(false);
+			}
+		},
+		[journalId, selectedDate, title, editor, onSave, titleRequired]
+	);
 
 	useEffect(() => {
 		if (!onCommandsChange) return;
@@ -208,9 +222,10 @@ export function EntryEditor({
 
 	const handleKeyDown = useCallback(
 		(e: React.KeyboardEvent) => {
-			if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+			if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
 				e.preventDefault();
-				void handleSave();
+				// Shift keeps edit mode; plain Ctrl+S saves and returns to read-only.
+				void handleSave(e.shiftKey);
 			}
 		},
 		[handleSave]
@@ -351,8 +366,8 @@ export function EntryEditor({
 							/>
 						)}
 
-						<div className="flex-1">
-							<EditorContent editor={editor} />
+						<div className="flex flex-1 flex-col">
+							<EditorContent editor={editor} className="flex flex-1 flex-col" />
 						</div>
 					</div>
 				</div>

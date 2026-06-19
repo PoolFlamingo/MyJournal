@@ -164,7 +164,9 @@
 		"storageLabel": "Almacenamiento",
 		"storageValue": "Tauri SQLite",
 		"editorFont": "Fuente por defecto del editor",
-		"editorFontDescription": "Elige la fuente con la que se muestran todas tus entradas. Puedes elegir cualquiera de la lista o subir la tuya (.ttf, .otf, .woff, .woff2)."
+		"editorFontDescription": "Elige la fuente con la que se muestran todas tus entradas. Puedes elegir cualquiera de la lista o subir la tuya (.ttf, .otf, .woff, .woff2).",
+		"saveKeepEditing": "Guardar sin salir de edición",
+		"toggleSidebar": "Mostrar / ocultar barra lateral"
 	},
 	"calendar": {
 		"today": "Hoy",
@@ -214,7 +216,11 @@
 			"4": "Ju",
 			"5": "Vi",
 			"6": "Sa"
-		}
+		},
+		"prevMonth": "Mes anterior",
+		"nextMonth": "Mes siguiente",
+		"month": "Mes",
+		"year": "Año"
 	},
 	"settings": {
 		"weekStart": "Inicio de la semana",
@@ -264,5 +270,11 @@
 		"delete": "Eliminar fuente",
 		"tooltip": "Fuente del texto",
 		"useDefault": "Predeterminada del editor"
+	},
+	"fontSize": {
+		"label": "Tamaño del texto",
+		"decrease": "Reducir tamaño",
+		"increase": "Aumentar tamaño",
+		"presets": "Tamaños"
 	}
 }

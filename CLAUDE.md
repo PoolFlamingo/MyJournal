@@ -8,7 +8,7 @@ Aplicación de escritorio de diario personal: múltiples diarios, una entrada po
 
 ## Arquitectura real (importante)
 
-El README y los archivos `.github/copilot-instructions.md` mencionan un "Bun sidecar" como capa de persistencia. **Eso es histórico.** El binario sidecar ya no se invoca: `src-tauri/src/lib.rs` no registra `tauri_plugin_shell` ni lanza ningún proceso hijo. Todo el dominio corre dentro del host Rust:
+El README y los archivos `.github/copilot-instructions.md` mencionan un "Bun sidecar" como capa de persistencia. **Eso es histórico y el código ya se eliminó** (carpetas `sidecar/`, `sidecar-drizzle/`, `src-tauri/binaries/` y el plugin `tauri-plugin-shell`). Todo el dominio corre dentro del host Rust:
 
 ```
 React UI
@@ -22,9 +22,8 @@ Capas:
 
 - [src/](src/) — React, hooks, providers, i18n, servicios tipados (`src/services/journalApi.ts` envuelve `invoke()`).
 - [src-tauri/](src-tauri/) — host Rust. Comandos, migraciones SQL, plugins.
-- [sidecar/](sidecar/) y [sidecar-drizzle/](sidecar-drizzle/) — código Bun/Drizzle **no usado en runtime**. Se conserva como referencia del esquema y porque algunas tablas (incluido `todos`) se reproducen en `src-tauri/src/db.rs`. No agregues lógica nueva ahí salvo que el cambio sea explícitamente "volver al sidecar".
 
-Si una tarea pide tocar persistencia o dominio, edita los comandos Rust y el `src/services/journalApi.ts` correspondiente, no el sidecar.
+Si una tarea pide tocar persistencia o dominio, edita los comandos Rust y el `src/services/journalApi.ts` correspondiente.
 
 ## Estructura clave para navegar
 
@@ -64,7 +63,7 @@ Estado en frontend (preferencias UI, no dominio) se persiste con `tauri-plugin-s
 
 - **Indentación**: tabs. Ancho 2 para `tsx/json/css/html`; ancho 4 por defecto para el resto. Configurado en `.editorconfig`.
 - **Prettier**: comillas dobles, `;` siempre, `printWidth: 90`, `trailingComma: "es5"`, `endOfLine: lf`. No reformatees archivos enteros: respeta el estilo existente.
-- **ESLint** ignora `dist`, `src-tauri`, `sidecar`, `sidecar-drizzle`, `scripts`. Lintar fuera de `src/` no aplica.
+- **ESLint** ignora `dist`, `src-tauri`, `scripts`. Lintar fuera de `src/` no aplica.
 - **TypeScript**: strict, `noUnusedLocals` y `noUnusedParameters` activos. Usa el alias `@/` para imports dentro de `src/`.
 - **Componentes React**: funcionales con hooks. Los componentes deben llamar a `src/services/*` o hooks, no a `invoke()` ni a plugins de Tauri directamente (salvo providers/wrappers de plataforma como `update-provider.tsx`, `language-provider.tsx`).
 - **i18n**: **toda cadena visible** pasa por `t()` de `useTranslation`. Antes de escribir el componente, añade la clave a `src/i18n/locales/es/*.json` y `src/i18n/locales/en/*.json`. Agrupa por namespace existente (`common`, `journal`, etc.). Esto incluye `placeholder`, `title`, `aria-label`, badges, errores, fallback.
@@ -84,7 +83,6 @@ npm run lint                   # ESLint sobre src/
 npm run format                 # Prettier write sobre src/
 npm run format:check           # Prettier check
 npx tsc --noEmit               # type-check del frontend
-npm run build:migrations       # regenerar SQL con drizzle-kit (referencia, no runtime)
 node scripts/release.mjs patch # bump versión + commit + tag + push (dispara GH Actions)
 ```
 
@@ -96,10 +94,8 @@ Push de un tag `v*` ⇒ `.github/workflows/release.yml` construye en Windows/mac
 
 ## Cosas que romper sin querer
 
-- **No reintroduzcas el sidecar al runtime** (registrar `tauri_plugin_shell` y spawn del binario) sin entender que duplicaría la persistencia: tanto el sidecar como `tauri-plugin-sql` se conectan a `my-journal.db` y se pisarían.
 - **No subas `dist/`, `node_modules/`, `src-tauri/target/`, `*.db`, `private/`, `keys/`.** Ya están en `.gitignore`.
 - El archivo `src-tauri/UsersNitropc...my-journal.db` en el root del crate es basura dejada por una corrida vieja en Windows; no es el path real. Ignóralo o bórralo, no escribas contra él.
-- La carpeta `src-tauri/binaries/` contiene un binario sidecar viejo de Windows. No lo enlaces; ya no se bundlea.
 - **`tsconfig.json` no contiene `ignoreDeprecations`** pese a lo que diga `.github/copilot-instructions.md`. Si una tarea pide preservarlo, verifica primero.
 - Las migraciones en `src-tauri/src/db.rs` son idempotentes (`CREATE TABLE IF NOT EXISTS`). Si añades una columna, hazlo aditivo o con `ALTER TABLE ... ADD COLUMN` envuelto en try/catch como ya se hace para `title_required`.
 - El contenido del editor se guarda como **JSON serializado de Tiptap** (`editor.getJSON()` ⇒ `JSON.stringify`). La función `parseContent` en `EntryEditor.tsx` tiene fallback a texto plano para entradas legacy; mantenlo si tocas el formato.

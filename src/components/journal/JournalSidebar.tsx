@@ -1,14 +1,30 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitch } from "@/components/language-switch";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { BookText, Plus, Lock, Unlock, LayoutDashboard, Trash2 } from "lucide-react";
+import {
+	BookText,
+	Plus,
+	Lock,
+	Unlock,
+	LayoutDashboard,
+	Trash2,
+	ChevronLeft,
+	ChevronRight,
+} from "lucide-react";
 import type { JournalSummary, CalendarDayState } from "@/types/journal";
 import { useWeekStart } from "@/hooks/useWeekStart";
 import { cn } from "@/lib/utils";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -70,6 +86,31 @@ export function JournalSidebar({
 		? new Date(selectedDate + "T12:00:00")
 		: new Date();
 
+	// The displayed month is controlled so it can be driven by our own shadcn
+	// Select dropdowns and the prev/next arrows.
+	const [displayMonth, setDisplayMonth] = useState<Date>(selectedDateObj);
+	const [prevSelectedDate, setPrevSelectedDate] = useState(selectedDate);
+
+	// Jump the visible month when the selected date moves to another month.
+	// Adjusting state during render is React's recommended alternative to an effect.
+	if (selectedDate !== prevSelectedDate) {
+		setPrevSelectedDate(selectedDate);
+		if (
+			selectedDateObj.getFullYear() !== displayMonth.getFullYear() ||
+			selectedDateObj.getMonth() !== displayMonth.getMonth()
+		) {
+			setDisplayMonth(selectedDateObj);
+		}
+	}
+
+	const goToMonth = useCallback(
+		(next: Date) => {
+			setDisplayMonth(next);
+			onMonthChange(next.getFullYear(), next.getMonth() + 1);
+		},
+		[onMonthChange]
+	);
+
 	function handleDateSelect(date: Date | undefined) {
 		if (!date) return;
 		const year = date.getFullYear();
@@ -78,25 +119,19 @@ export function JournalSidebar({
 		onSelectDate(`${year}-${month}-${day}`);
 	}
 
-	function handleMonthChange(month: Date) {
-		onMonthChange(month.getFullYear(), month.getMonth() + 1);
-	}
+	const monthOptions = Array.from({ length: 12 }, (_, i) => ({
+		value: i,
+		label: t(`calendar.monthsShort.${i}`),
+	}));
+
+	const currentYear = new Date().getFullYear();
+	// Newest first, reaching back far enough for old journals.
+	const yearOptions = Array.from({ length: 106 }, (_, i) => currentYear + 5 - i);
 
 	const formatters = {
-		formatMonthDropdown: (date: Date) => {
-			const month = date.getMonth();
-			return t(`calendar.monthsShort.${month}`);
-		},
-		formatCaption: (date: Date) => {
-			const month = t(`calendar.months.${date.getMonth()}`);
-			return `${month} ${date.getFullYear()}`;
-		},
 		formatWeekdayName: (date: Date) => {
 			const dayIndex = date.getDay();
 			return t(`calendar.weekDaysShort.${dayIndex}`);
-		},
-		formatYearDropdown: (date: Date) => {
-			return date.getFullYear().toString();
 		},
 	};
 
@@ -124,12 +159,87 @@ export function JournalSidebar({
 					<div className="px-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
 						{t("sidebar.calendar", "Calendario")}
 					</div>
-					<div className="mx-auto mt-2 w-full min-w-0 max-w-2xs rounded-xl border border-border/50 bg-background/50 shadow-sm">
+					<div className="mx-auto mt-2 w-full min-w-0 max-w-2xs rounded-xl border border-border/50 bg-background/50 p-2 shadow-sm">
+						{/* Month / year navigation */}
+						<div className="mb-1 flex items-center gap-1">
+							<Button
+								variant="ghost"
+								size="icon"
+								className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+								onClick={() =>
+									goToMonth(
+										new Date(displayMonth.getFullYear(), displayMonth.getMonth() - 1, 1)
+									)
+								}
+								aria-label={t("calendar.prevMonth", "Mes anterior")}
+							>
+								<ChevronLeft className="size-4" />
+							</Button>
+							<div className="flex flex-1 items-center justify-center gap-1.5">
+								<Select
+									value={displayMonth.getMonth().toString()}
+									onValueChange={(v) =>
+										goToMonth(new Date(displayMonth.getFullYear(), Number(v), 1))
+									}
+								>
+									<SelectTrigger
+										size="sm"
+										aria-label={t("calendar.month", "Mes")}
+										className="gap-1 px-2 font-medium"
+									>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent className="max-h-72">
+										{monthOptions.map((m) => (
+											<SelectItem key={m.value} value={m.value.toString()}>
+												{m.label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<Select
+									value={displayMonth.getFullYear().toString()}
+									onValueChange={(v) =>
+										goToMonth(new Date(Number(v), displayMonth.getMonth(), 1))
+									}
+								>
+									<SelectTrigger
+										size="sm"
+										aria-label={t("calendar.year", "Año")}
+										className="gap-1 px-2 font-medium"
+									>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent className="max-h-72">
+										{yearOptions.map((y) => (
+											<SelectItem key={y} value={y.toString()}>
+												{y}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
+							<Button
+								variant="ghost"
+								size="icon"
+								className="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+								onClick={() =>
+									goToMonth(
+										new Date(displayMonth.getFullYear(), displayMonth.getMonth() + 1, 1)
+									)
+								}
+								aria-label={t("calendar.nextMonth", "Mes siguiente")}
+							>
+								<ChevronRight className="size-4" />
+							</Button>
+						</div>
+
 						<Calendar
 							mode="single"
+							month={displayMonth}
+							onMonthChange={goToMonth}
 							selected={selectedDateObj}
 							onSelect={handleDateSelect}
-							onMonthChange={handleMonthChange}
 							modifiers={{
 								hasEntry: (date) => {
 									const y = date.getFullYear();
@@ -139,7 +249,6 @@ export function JournalSidebar({
 								},
 							}}
 							weekStartsOn={weekStart}
-							captionLayout="dropdown"
 							formatters={formatters}
 							modifiersClassNames={{
 								hasEntry:
@@ -148,8 +257,10 @@ export function JournalSidebar({
 							classNames={{
 								month_grid: "block w-full border-collapse",
 								weeks: "block",
+								month_caption: "hidden",
+								nav: "hidden",
 							}}
-							className="w-full p-2"
+							className="w-full p-0"
 						/>
 					</div>
 				</div>

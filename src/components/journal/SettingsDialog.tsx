@@ -61,7 +61,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-lg">
+			<DialogContent className="flex max-h-[85vh] flex-col overflow-hidden sm:max-w-lg">
 				<DialogHeader>
 					<DialogTitle className="text-2xl">
 						{t("journal:menu.settings", "Configuración")}
@@ -74,8 +74,11 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 					</DialogDescription>
 				</DialogHeader>
 
-				<Tabs defaultValue="appearance" className="w-full">
-					<TabsList className="grid w-full grid-cols-3">
+				<Tabs
+					defaultValue="appearance"
+					className="flex w-full min-h-0 flex-1 flex-col overflow-hidden"
+				>
+					<TabsList className="grid w-full shrink-0 grid-cols-3">
 						<TabsTrigger value="appearance" className="flex items-center gap-2">
 							<Palette className="size-4" />
 							<span className="hidden sm:inline">
@@ -97,7 +100,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 					</TabsList>
 
 					{/* Appearance Tab */}
-					<TabsContent value="appearance" className="space-y-6 mt-6">
+					<TabsContent
+						value="appearance"
+						className="space-y-6 mt-6 min-h-0 flex-1 overflow-y-auto pr-1"
+					>
 						<div className="space-y-6">
 							{/* Light/Dark Mode */}
 							<div>
@@ -258,7 +264,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 					</TabsContent>
 
 					{/* Language Tab */}
-					<TabsContent value="language" className="space-y-6 mt-6">
+					<TabsContent
+						value="language"
+						className="space-y-6 mt-6 min-h-0 flex-1 overflow-y-auto pr-1"
+					>
 						<div className="space-y-3">
 							<Label htmlFor="language-select" className="text-base font-semibold">
 								{t("journal:menu.language", "Idioma")}
@@ -288,7 +297,10 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 					</TabsContent>
 
 					{/* About Tab */}
-					<TabsContent value="about" className="space-y-6 mt-6">
+					<TabsContent
+						value="about"
+						className="space-y-6 mt-6 min-h-0 flex-1 overflow-y-auto pr-1"
+					>
 						<div className="space-y-4">
 							<div className="rounded-lg border border-border/50 bg-muted/30 p-4">
 								<h3 className="font-semibold text-foreground mb-2">My Journal</h3>
