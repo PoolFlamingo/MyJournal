@@ -30,6 +30,11 @@ tauri-plugin-window-state = "2"
 tauri-plugin-sql = { version = "2.4.0", features = ["sqlite"] }
 uuid = { version = "1.23.1", features = ["v4", "fast-rng"] }
 sha2 = "0.11.0"
-allsorts = "0.15"
+# Pure-Rust deflate backend (miniz_oxide) instead of the default `flate2_zlib`,
+# which pulls libz-sys and needs a C toolchain (`cc`) — fragile on Windows CI.
+allsorts = { version = "0.15", default-features = false, features = [
+	"outline",
+	"flate2_rust",
+] }
 sqlx = { version = "0.8.6", features = ["sqlite", "runtime-tokio-native-tls"] }
 
