@@ -255,7 +255,7 @@ export function JournalSidebar({
 									"relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-primary font-medium text-primary",
 							}}
 							classNames={{
-								month_grid: "block w-full border-collapse",
+								month_grid: "block w-full border-collapse [&_thead]:block",
 								weeks: "block",
 								month_caption: "hidden",
 								nav: "hidden",
