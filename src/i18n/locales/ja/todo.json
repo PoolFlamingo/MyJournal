@@ -1,0 +1,32 @@
+{
+  "form": {
+    "titleLabel": "タイトル",
+    "descriptionLabel": "説明",
+    "titlePlaceholder": "何をする必要がありますか？",
+    "descriptionPlaceholder": "説明（任意）",
+    "save": "保存",
+    "add": "追加",
+    "cancel": "キャンセル"
+  },
+  "filters": {
+    "all": "すべて",
+    "active": "未完了",
+    "completed": "完了",
+    "clearCompleted": "完了したものを消去"
+  },
+  "list": {
+    "emptyTitle": "タスクがまだありません",
+    "emptyDescription": "上のフォームから新しいタスクを追加してください"
+  },
+  "item": {
+    "edit": "編集",
+    "delete": "削除",
+    "confirmTitle": "タスクを削除",
+    "confirmMessage": "「{{title}}」を削除してもよろしいですか？",
+    "confirmWarning": "この操作は元に戻せません。",
+    "markPending": "未完了",
+    "markCompleted": "完了",
+    "checkboxLabel": "「{{title}}」を{{status}}としてマーク",
+    "editTitle": "タスクを編集"
+  }
+}

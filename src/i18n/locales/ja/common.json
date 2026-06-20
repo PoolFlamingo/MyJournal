@@ -1,0 +1,21 @@
+{
+	"title": "My Journal",
+	"subtitle": "あなたの個人的な日記",
+	"footer": "Tauri + React + Bun + SQLite",
+	"theme": {
+		"change": "テーマを変更",
+		"light": "ライト",
+		"dark": "ダーク",
+		"system": "システム",
+		"toggleToLight": "ライトテーマに切り替え",
+		"toggleToDark": "ダークテーマに切り替え"
+	},
+	"language": {
+		"label": "言語",
+		"es": "Español",
+		"en": "English"
+	},
+	"errors": {
+		"loadFailed": "タスクの読み込みに失敗しました"
+	}
+}

@@ -1,0 +1,21 @@
+{
+	"title": "My Journal",
+	"subtitle": "Dein persönliches Tagebuch",
+	"footer": "Tauri + React + Bun + SQLite",
+	"theme": {
+		"change": "Design ändern",
+		"light": "Hell",
+		"dark": "Dunkel",
+		"system": "System",
+		"toggleToLight": "Zum hellen Design wechseln",
+		"toggleToDark": "Zum dunklen Design wechseln"
+	},
+	"language": {
+		"label": "Sprache",
+		"es": "Español",
+		"en": "English"
+	},
+	"errors": {
+		"loadFailed": "Aufgaben konnten nicht geladen werden"
+	}
+}

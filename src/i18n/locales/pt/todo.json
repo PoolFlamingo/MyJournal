@@ -1,0 +1,32 @@
+{
+	"form": {
+		"titleLabel": "Título",
+		"descriptionLabel": "Descrição",
+		"titlePlaceholder": "O que precisa de fazer?",
+		"descriptionPlaceholder": "Descrição (opcional)",
+		"save": "Guardar",
+		"add": "Adicionar",
+		"cancel": "Cancelar"
+	},
+	"filters": {
+		"all": "Todas",
+		"active": "Ativas",
+		"completed": "Concluídas",
+		"clearCompleted": "Limpar concluídas"
+	},
+	"list": {
+		"emptyTitle": "Ainda não há tarefas",
+		"emptyDescription": "Adicione uma nova tarefa utilizando o formulário acima"
+	},
+	"item": {
+		"edit": "Editar",
+		"delete": "Eliminar",
+		"confirmTitle": "Eliminar tarefa",
+		"confirmMessage": "Tem a certeza de que pretende eliminar \"{{title}}\"?",
+		"confirmWarning": "Esta ação não pode ser anulada.",
+		"markPending": "pendente",
+		"markCompleted": "concluída",
+		"checkboxLabel": "Marcar \"{{title}}\" como {{status}}",
+		"editTitle": "Editar tarefa"
+	}
+}

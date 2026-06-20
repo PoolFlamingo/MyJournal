@@ -1,5 +1,9 @@
 ﻿import { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useLanguage } from "@/components/language-provider";
+import { useSpellcheck } from "@/components/spellcheck-provider";
+import { setSpellcheck, spellcheckLocales } from "@/services/systemApi";
+import { EditorContextMenu } from "./EditorContextMenu";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -74,6 +78,8 @@ export function EntryEditor({
 	onCommandsChange,
 }: EntryEditorProps) {
 	const { t } = useTranslation("journal");
+	const { language } = useLanguage();
+	const { enabled: spellcheckEnabled } = useSpellcheck();
 	const [title, setTitle] = useState("");
 	const [saving, setSaving] = useState(false);
 	const [dirty, setDirty] = useState(false);
@@ -142,6 +148,18 @@ export function EntryEditor({
 	useEffect(() => {
 		editor?.setEditable(isEditMode);
 	}, [editor, isEditMode]);
+
+	// Corrector ortográfico del cuerpo: aplica los atributos nativos del webview
+	// (`spellcheck` + `lang`) sobre el contenteditable de TipTap, y además habilita
+	// el corrector a nivel de WebContext (necesario en Linux/WebKitGTK). El idioma
+	// del diccionario sigue al idioma activo de la app.
+	useEffect(() => {
+		if (!editor) return;
+		const dom = editor.view.dom as HTMLElement;
+		dom.setAttribute("spellcheck", String(spellcheckEnabled));
+		dom.setAttribute("lang", language);
+		void setSpellcheck(spellcheckEnabled, spellcheckLocales(language));
+	}, [editor, spellcheckEnabled, language, isEditMode]);
 
 	const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setTitle(e.target.value);
@@ -355,6 +373,8 @@ export function EntryEditor({
 						{(isEditMode || title.trim().length > 0) && (
 							<TextareaAutosize
 								readOnly={!isEditMode}
+								spellCheck={isEditMode && spellcheckEnabled}
+								lang={language}
 								placeholder={
 									isEditMode
 										? t("entry.titlePlaceholder", "¿Qué quieres escribir hoy?")
@@ -367,7 +387,13 @@ export function EntryEditor({
 						)}
 
 						<div className="flex flex-1 flex-col">
-							<EditorContent editor={editor} className="flex flex-1 flex-col" />
+							{isEditMode && editor ? (
+								<EditorContextMenu editor={editor}>
+									<EditorContent editor={editor} className="flex flex-1 flex-col" />
+								</EditorContextMenu>
+							) : (
+								<EditorContent editor={editor} className="flex flex-1 flex-col" />
+							)}
 						</div>
 					</div>
 				</div>

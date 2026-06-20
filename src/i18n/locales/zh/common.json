@@ -1,0 +1,21 @@
+{
+	"title": "My Journal",
+	"subtitle": "你的私人日记",
+	"footer": "Tauri + React + Bun + SQLite",
+	"theme": {
+		"change": "更换主题",
+		"light": "浅色",
+		"dark": "深色",
+		"system": "跟随系统",
+		"toggleToLight": "切换到浅色主题",
+		"toggleToDark": "切换到深色主题"
+	},
+	"language": {
+		"label": "语言",
+		"es": "Español",
+		"en": "English"
+	},
+	"errors": {
+		"loadFailed": "加载任务失败"
+	}
+}

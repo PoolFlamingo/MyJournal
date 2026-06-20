@@ -1,0 +1,21 @@
+{
+	"title": "My Journal",
+	"subtitle": "Jurnalul tău personal",
+	"footer": "Tauri + React + Bun + SQLite",
+	"theme": {
+		"change": "Schimbă tema",
+		"light": "Luminoasă",
+		"dark": "Întunecată",
+		"system": "Sistem",
+		"toggleToLight": "Comută la tema luminoasă",
+		"toggleToDark": "Comută la tema întunecată"
+	},
+	"language": {
+		"label": "Limbă",
+		"es": "Español",
+		"en": "English"
+	},
+	"errors": {
+		"loadFailed": "Încărcarea sarcinilor a eșuat"
+	}
+}

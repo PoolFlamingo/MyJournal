@@ -1,0 +1,32 @@
+{
+	"form": {
+		"titleLabel": "Tytuł",
+		"descriptionLabel": "Opis",
+		"titlePlaceholder": "Co musisz zrobić?",
+		"descriptionPlaceholder": "Opis (opcjonalnie)",
+		"save": "Zapisz",
+		"add": "Dodaj",
+		"cancel": "Anuluj"
+	},
+	"filters": {
+		"all": "Wszystkie",
+		"active": "Aktywne",
+		"completed": "Ukończone",
+		"clearCompleted": "Wyczyść ukończone"
+	},
+	"list": {
+		"emptyTitle": "Brak zadań",
+		"emptyDescription": "Dodaj nowe zadanie za pomocą formularza powyżej"
+	},
+	"item": {
+		"edit": "Edytuj",
+		"delete": "Usuń",
+		"confirmTitle": "Usuń zadanie",
+		"confirmMessage": "Czy na pewno chcesz usunąć \"{{title}}\"?",
+		"confirmWarning": "Tej operacji nie można cofnąć.",
+		"markPending": "oczekujące",
+		"markCompleted": "ukończone",
+		"checkboxLabel": "Oznacz \"{{title}}\" jako {{status}}",
+		"editTitle": "Edytuj zadanie"
+	}
+}

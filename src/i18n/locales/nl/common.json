@@ -1,0 +1,21 @@
+{
+	"title": "My Journal",
+	"subtitle": "Je persoonlijke dagboek",
+	"footer": "Tauri + React + Bun + SQLite",
+	"theme": {
+		"change": "Thema wijzigen",
+		"light": "Licht",
+		"dark": "Donker",
+		"system": "Systeem",
+		"toggleToLight": "Naar licht thema wisselen",
+		"toggleToDark": "Naar donker thema wisselen"
+	},
+	"language": {
+		"label": "Taal",
+		"es": "Español",
+		"en": "English"
+	},
+	"errors": {
+		"loadFailed": "Taken konden niet worden geladen"
+	}
+}

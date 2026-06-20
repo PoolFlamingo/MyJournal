@@ -1,0 +1,32 @@
+{
+  "form": {
+    "titleLabel": "제목",
+    "descriptionLabel": "설명",
+    "titlePlaceholder": "무엇을 해야 하나요?",
+    "descriptionPlaceholder": "설명 (선택 사항)",
+    "save": "저장",
+    "add": "추가",
+    "cancel": "취소"
+  },
+  "filters": {
+    "all": "전체",
+    "active": "진행 중",
+    "completed": "완료됨",
+    "clearCompleted": "완료된 항목 지우기"
+  },
+  "list": {
+    "emptyTitle": "아직 작업이 없습니다",
+    "emptyDescription": "위 양식을 사용하여 새 작업을 추가하세요"
+  },
+  "item": {
+    "edit": "편집",
+    "delete": "삭제",
+    "confirmTitle": "작업 삭제",
+    "confirmMessage": "\"{{title}}\"을(를) 삭제하시겠습니까?",
+    "confirmWarning": "이 작업은 되돌릴 수 없습니다.",
+    "markPending": "진행 중",
+    "markCompleted": "완료됨",
+    "checkboxLabel": "\"{{title}}\"을(를) {{status}}(으)로 표시",
+    "editTitle": "작업 편집"
+  }
+}

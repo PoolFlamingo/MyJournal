@@ -1,0 +1,32 @@
+{
+  "form": {
+    "titleLabel": "Titolo",
+    "descriptionLabel": "Descrizione",
+    "titlePlaceholder": "Cosa devi fare?",
+    "descriptionPlaceholder": "Descrizione (facoltativa)",
+    "save": "Salva",
+    "add": "Aggiungi",
+    "cancel": "Annulla"
+  },
+  "filters": {
+    "all": "Tutte",
+    "active": "Attive",
+    "completed": "Completate",
+    "clearCompleted": "Cancella completate"
+  },
+  "list": {
+    "emptyTitle": "Ancora nessuna attività",
+    "emptyDescription": "Aggiungi una nuova attività usando il modulo qui sopra"
+  },
+  "item": {
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "confirmTitle": "Elimina attività",
+    "confirmMessage": "Sei sicuro di voler eliminare \"{{title}}\"?",
+    "confirmWarning": "Questa azione non può essere annullata.",
+    "markPending": "in sospeso",
+    "markCompleted": "completata",
+    "checkboxLabel": "Segna \"{{title}}\" come {{status}}",
+    "editTitle": "Modifica attività"
+  }
+}

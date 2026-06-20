@@ -1,0 +1,32 @@
+{
+  "form": {
+    "titleLabel": "Заголовок",
+    "descriptionLabel": "Описание",
+    "titlePlaceholder": "Что нужно сделать?",
+    "descriptionPlaceholder": "Описание (необязательно)",
+    "save": "Сохранить",
+    "add": "Добавить",
+    "cancel": "Отмена"
+  },
+  "filters": {
+    "all": "Все",
+    "active": "Активные",
+    "completed": "Завершённые",
+    "clearCompleted": "Очистить завершённые"
+  },
+  "list": {
+    "emptyTitle": "Пока нет задач",
+    "emptyDescription": "Добавьте новую задачу с помощью формы выше"
+  },
+  "item": {
+    "edit": "Редактировать",
+    "delete": "Удалить",
+    "confirmTitle": "Удалить задачу",
+    "confirmMessage": "Вы уверены, что хотите удалить «{{title}}»?",
+    "confirmWarning": "Это действие нельзя отменить.",
+    "markPending": "не выполнено",
+    "markCompleted": "выполнено",
+    "checkboxLabel": "Отметить «{{title}}» как {{status}}",
+    "editTitle": "Редактировать задачу"
+  }
+}

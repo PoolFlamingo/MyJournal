@@ -1,0 +1,21 @@
+{
+	"title": "My Journal",
+	"subtitle": "Ваш личный дневник",
+	"footer": "Tauri + React + Bun + SQLite",
+	"theme": {
+		"change": "Сменить тему",
+		"light": "Светлая",
+		"dark": "Тёмная",
+		"system": "Системная",
+		"toggleToLight": "Переключить на светлую тему",
+		"toggleToDark": "Переключить на тёмную тему"
+	},
+	"language": {
+		"label": "Язык",
+		"es": "Español",
+		"en": "English"
+	},
+	"errors": {
+		"loadFailed": "Не удалось загрузить задачи"
+	}
+}

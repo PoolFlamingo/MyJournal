@@ -1,0 +1,32 @@
+{
+  "form": {
+    "titleLabel": "Titre",
+    "descriptionLabel": "Description",
+    "titlePlaceholder": "Que devez-vous faire ?",
+    "descriptionPlaceholder": "Description (facultative)",
+    "save": "Enregistrer",
+    "add": "Ajouter",
+    "cancel": "Annuler"
+  },
+  "filters": {
+    "all": "Toutes",
+    "active": "Actives",
+    "completed": "Terminées",
+    "clearCompleted": "Effacer les terminées"
+  },
+  "list": {
+    "emptyTitle": "Aucune tâche pour l'instant",
+    "emptyDescription": "Ajoutez une nouvelle tâche à l'aide du formulaire ci-dessus"
+  },
+  "item": {
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "confirmTitle": "Supprimer la tâche",
+    "confirmMessage": "Voulez-vous vraiment supprimer « {{title}} » ?",
+    "confirmWarning": "Cette action est irréversible.",
+    "markPending": "en attente",
+    "markCompleted": "terminée",
+    "checkboxLabel": "Marquer « {{title}} » comme {{status}}",
+    "editTitle": "Modifier la tâche"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "form": {
+    "titleLabel": "Titlu",
+    "descriptionLabel": "Descriere",
+    "titlePlaceholder": "Ce ai nevoie să faci?",
+    "descriptionPlaceholder": "Descriere (opțional)",
+    "save": "Salvează",
+    "add": "Adaugă",
+    "cancel": "Anulează"
+  },
+  "filters": {
+    "all": "Toate",
+    "active": "Active",
+    "completed": "Finalizate",
+    "clearCompleted": "Șterge finalizate"
+  },
+  "list": {
+    "emptyTitle": "Nicio sarcină încă",
+    "emptyDescription": "Adaugă o sarcină nouă folosind formularul de mai sus"
+  },
+  "item": {
+    "edit": "Editează",
+    "delete": "Șterge",
+    "confirmTitle": "Șterge sarcina",
+    "confirmMessage": "Sigur vrei să ștergi „{{title}}”?",
+    "confirmWarning": "Această acțiune nu poate fi anulată.",
+    "markPending": "în așteptare",
+    "markCompleted": "finalizată",
+    "checkboxLabel": "Marchează „{{title}}” ca {{status}}",
+    "editTitle": "Editează sarcina"
+  }
+}

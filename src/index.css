@@ -202,7 +202,7 @@
 	}
 	body {
 		@apply bg-background text-foreground;
-		font-family: var(--font-sans);
+		font-family: var(--font-sans), "Noto Color Emoji";
 		letter-spacing: var(--tracking-normal);
 	}
 }
@@ -213,7 +213,17 @@
    EditorFontProvider; it falls back to the active theme's serif. */
 .tiptap,
 .mj-editor-surface {
-	font-family: var(--editor-font, var(--font-serif));
+	font-family: var(--editor-font, var(--font-serif)), "Noto Color Emoji";
+}
+
+/* ── Emoji a color (banderas del selector de idioma, etc.) ────
+   "Noto Color Emoji" se empaqueta localmente vía @fontsource (sin URLs).
+   Necesario sobre todo en Windows, donde el sistema no dibuja banderas. */
+.font-emoji {
+	font-family:
+		"Noto Color Emoji", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+		sans-serif;
+	line-height: 1;
 }
 
 /* ── TipTap editor content styles ─────────────────────────── */

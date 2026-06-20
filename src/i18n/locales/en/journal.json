@@ -109,7 +109,21 @@
 		"tableDescription": "Choose the number of rows and columns.",
 		"rows": "Rows",
 		"columns": "Columns",
-		"insert": "Insert"
+		"insert": "Insert",
+		"spellcheck": "Spell check"
+	},
+	"context": {
+		"formatting": "Formatting",
+		"bold": "Bold",
+		"italic": "Italic",
+		"underline": "Underline",
+		"strike": "Strikethrough",
+		"cut": "Cut",
+		"copy": "Copy",
+		"paste": "Paste",
+		"selectAll": "Select all",
+		"emoji": "Insert emoji…",
+		"spellcheck": "Spell check"
 	},
 	"menu": {
 		"file": "File",

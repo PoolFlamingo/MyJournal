@@ -109,7 +109,21 @@
 		"tableDescription": "Elige el número de filas y columnas.",
 		"rows": "Filas",
 		"columns": "Columnas",
-		"insert": "Insertar"
+		"insert": "Insertar",
+		"spellcheck": "Corrector ortográfico"
+	},
+	"context": {
+		"formatting": "Formato",
+		"bold": "Negrita",
+		"italic": "Cursiva",
+		"underline": "Subrayado",
+		"strike": "Tachado",
+		"cut": "Cortar",
+		"copy": "Copiar",
+		"paste": "Pegar",
+		"selectAll": "Seleccionar todo",
+		"emoji": "Insertar emoji…",
+		"spellcheck": "Corrector ortográfico"
 	},
 	"menu": {
 		"file": "Archivo",

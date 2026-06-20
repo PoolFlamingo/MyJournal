@@ -25,6 +25,8 @@ import { useTheme } from "@/components/theme-provider";
 import { useLanguage } from "@/components/language-provider";
 import { useUpdate } from "@/components/update-provider";
 import { useThemePreset } from "@/hooks/useThemePreset";
+import type { SupportedLanguage } from "@/i18n/resources";
+import { Flag } from "@/components/flag";
 import { useWeekStart } from "@/hooks/useWeekStart";
 import { FontPicker } from "./FontPicker";
 import {
@@ -274,15 +276,18 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 							</Label>
 							<Select
 								value={language}
-								onValueChange={(value) => void setLanguage(value as "es" | "en")}
+								onValueChange={(value) => void setLanguage(value as SupportedLanguage)}
 							>
 								<SelectTrigger id="language-select">
 									<SelectValue />
 								</SelectTrigger>
-								<SelectContent>
+								<SelectContent className="max-h-80">
 									{supportedLanguages.map((lang) => (
 										<SelectItem key={lang.code} value={lang.code}>
-											{lang.label}
+											<span className="flex items-center gap-2.5">
+												<Flag code={lang.region} className="text-base" />
+												{lang.label}
+											</span>
 										</SelectItem>
 									))}
 								</SelectContent>

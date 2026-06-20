@@ -1,0 +1,32 @@
+{
+  "form": {
+    "titleLabel": "Titel",
+    "descriptionLabel": "Beschreibung",
+    "titlePlaceholder": "Was musst du erledigen?",
+    "descriptionPlaceholder": "Beschreibung (optional)",
+    "save": "Speichern",
+    "add": "Hinzufügen",
+    "cancel": "Abbrechen"
+  },
+  "filters": {
+    "all": "Alle",
+    "active": "Aktiv",
+    "completed": "Erledigt",
+    "clearCompleted": "Erledigte löschen"
+  },
+  "list": {
+    "emptyTitle": "Noch keine Aufgaben",
+    "emptyDescription": "Füge eine neue Aufgabe über das obige Formular hinzu"
+  },
+  "item": {
+    "edit": "Bearbeiten",
+    "delete": "Löschen",
+    "confirmTitle": "Aufgabe löschen",
+    "confirmMessage": "Möchtest du \"{{title}}\" wirklich löschen?",
+    "confirmWarning": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "markPending": "ausstehend",
+    "markCompleted": "erledigt",
+    "checkboxLabel": "\"{{title}}\" als {{status}} markieren",
+    "editTitle": "Aufgabe bearbeiten"
+  }
+}

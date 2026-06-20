@@ -37,4 +37,13 @@ allsorts = { version = "0.15", default-features = false, features = [
 	"flate2_rust",
 ] }
 sqlx = { version = "0.8.6", features = ["sqlite", "runtime-tokio-native-tls"] }
+# Simulación de teclado para abrir el selector de emoji nativo del SO.
+# En Linux (X11) requiere `libxdo-dev` en tiempo de compilación.
+enigo = "0.2"
+
+# Solo Linux: habilitar el corrector de WebKitGTK a nivel de WebContext
+# (el atributo HTML `spellcheck` no basta). La versión debe coincidir con la
+# que usa wry/Tauri (ver Cargo.lock: 2.0.x) para compartir el mismo tipo WebView.
+[target.'cfg(target_os = "linux")'.dependencies]
+webkit2gtk = "2.0"
 

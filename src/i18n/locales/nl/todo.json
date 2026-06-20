@@ -1,0 +1,32 @@
+{
+  "form": {
+    "titleLabel": "Titel",
+    "descriptionLabel": "Beschrijving",
+    "titlePlaceholder": "Wat moet je doen?",
+    "descriptionPlaceholder": "Beschrijving (optioneel)",
+    "save": "Opslaan",
+    "add": "Toevoegen",
+    "cancel": "Annuleren"
+  },
+  "filters": {
+    "all": "Alle",
+    "active": "Actief",
+    "completed": "Voltooid",
+    "clearCompleted": "Voltooide wissen"
+  },
+  "list": {
+    "emptyTitle": "Nog geen taken",
+    "emptyDescription": "Voeg een nieuwe taak toe via het bovenstaande formulier"
+  },
+  "item": {
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "confirmTitle": "Taak verwijderen",
+    "confirmMessage": "Weet je zeker dat je \"{{title}}\" wilt verwijderen?",
+    "confirmWarning": "Deze actie kan niet ongedaan worden gemaakt.",
+    "markPending": "in behandeling",
+    "markCompleted": "voltooid",
+    "checkboxLabel": "\"{{title}}\" markeren als {{status}}",
+    "editTitle": "Taak bewerken"
+  }
+}

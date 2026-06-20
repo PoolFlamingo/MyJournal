@@ -15,11 +15,13 @@ import {
 } from "@/components/ui/dialog";
 import { FontPicker } from "./FontPicker";
 import { FontSizeControl } from "./FontSizeControl";
+import { useSpellcheck } from "@/components/spellcheck-provider";
 import {
 	Bold,
 	Italic,
 	Underline,
 	Strikethrough,
+	SpellCheck,
 	Heading1,
 	Heading2,
 	Heading3,
@@ -76,6 +78,7 @@ interface EditorToolbarProps {
 
 export function EditorToolbar({ editor }: EditorToolbarProps) {
 	const { t } = useTranslation("journal");
+	const { enabled: spellcheckEnabled, toggle: toggleSpellcheck } = useSpellcheck();
 
 	// Link dialog
 	const [linkOpen, setLinkOpen] = useState(false);
@@ -318,6 +321,16 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 					active={editor.isActive("table")}
 					title={t("toolbar.table")}
 					icon={<Table className="size-3.5" />}
+				/>
+
+				<Separator orientation="vertical" className="mx-1 h-5" />
+
+				{/* Spell check toggle (applies to title + body, language-aware) */}
+				<ToolbarButton
+					action={toggleSpellcheck}
+					active={spellcheckEnabled}
+					title={t("toolbar.spellcheck")}
+					icon={<SpellCheck className="size-3.5" />}
 				/>
 			</div>
 

@@ -1,0 +1,21 @@
+{
+	"title": "My Journal",
+	"subtitle": "나만의 개인 일기",
+	"footer": "Tauri + React + Bun + SQLite",
+	"theme": {
+		"change": "테마 변경",
+		"light": "라이트",
+		"dark": "다크",
+		"system": "시스템",
+		"toggleToLight": "라이트 테마로 전환",
+		"toggleToDark": "다크 테마로 전환"
+	},
+	"language": {
+		"label": "언어",
+		"es": "Español",
+		"en": "English"
+	},
+	"errors": {
+		"loadFailed": "작업을 불러오지 못했습니다"
+	}
+}
