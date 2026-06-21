@@ -41,9 +41,15 @@ import { cn } from "@/lib/utils";
 interface SettingsDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	/** Pestaña inicial al abrir ("appearance" | "language" | "about"). */
+	defaultTab?: string;
 }
 
-export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
+export function SettingsDialog({
+	open,
+	onOpenChange,
+	defaultTab = "appearance",
+}: SettingsDialogProps) {
 	const { t } = useTranslation(["journal", "common"]);
 	const { theme, resolvedTheme, setTheme } = useTheme();
 	const { language, setLanguage, supportedLanguages } = useLanguage();
@@ -77,7 +83,8 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 				</DialogHeader>
 
 				<Tabs
-					defaultValue="appearance"
+					key={defaultTab}
+					defaultValue={defaultTab}
 					className="flex w-full min-h-0 flex-1 flex-col overflow-hidden"
 				>
 					<TabsList className="grid w-full shrink-0 grid-cols-3">

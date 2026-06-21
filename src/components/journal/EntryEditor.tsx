@@ -56,13 +56,18 @@ interface EntryEditorProps {
 }
 
 export interface EntryEditorCommands {
-	save: () => Promise<void>;
+	save: (keepEditing?: boolean) => Promise<void>;
 	deleteEntry: () => Promise<void>;
 	undo: () => void;
 	redo: () => void;
 	toggleBold: () => void;
 	toggleItalic: () => void;
 	toggleUnderline: () => void;
+	toggleStrike: () => void;
+	cut: () => void;
+	copy: () => void;
+	paste: () => void;
+	selectAll: () => void;
 	canUndo: boolean;
 	canRedo: boolean;
 	canSave: boolean;
@@ -233,6 +238,31 @@ export function EntryEditor({
 			},
 			toggleUnderline: () => {
 				editor?.chain().focus().toggleUnderline().run();
+			},
+			toggleStrike: () => {
+				editor?.chain().focus().toggleStrike().run();
+			},
+			cut: () => {
+				editor?.chain().focus().run();
+				document.execCommand("cut");
+			},
+			copy: () => {
+				editor?.chain().focus().run();
+				document.execCommand("copy");
+			},
+			paste: () => {
+				void (async () => {
+					editor?.chain().focus().run();
+					try {
+						const text = await navigator.clipboard.readText();
+						if (text) editor?.chain().focus().insertContent(text).run();
+					} catch {
+						document.execCommand("paste");
+					}
+				})();
+			},
+			selectAll: () => {
+				editor?.chain().focus().selectAll().run();
 			},
 			canUndo,
 			canRedo,

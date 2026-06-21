@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { JournalSidebar } from "@/components/journal/JournalSidebar";
 import { EntryEditor } from "@/components/journal/EntryEditor";
-import { BookOpenText, PanelLeftIcon } from "lucide-react";
+import { BookOpenText, PanelLeftIcon, Check } from "lucide-react";
 import type {
 	JournalSummary,
 	JournalDetails,
@@ -15,9 +15,12 @@ import type {
 import { Separator } from "@/components/ui/separator";
 import {
 	Menubar,
+	MenubarCheckboxItem,
 	MenubarContent,
 	MenubarItem,
 	MenubarMenu,
+	MenubarRadioGroup,
+	MenubarRadioItem,
 	MenubarSeparator,
 	MenubarShortcut,
 	MenubarSub,
@@ -25,6 +28,11 @@ import {
 	MenubarSubTrigger,
 	MenubarTrigger,
 } from "@/components/ui/menubar";
+import { useTheme } from "@/components/theme-provider";
+import { useLanguage } from "@/components/language-provider";
+import { useSpellcheck } from "@/components/spellcheck-provider";
+import { useUpdate } from "@/components/update-provider";
+import { Flag } from "@/components/flag";
 import {
 	Dialog,
 	DialogContent,
@@ -113,10 +121,15 @@ export function JournalWorkspace({
 	onDeleteEntry,
 }: JournalWorkspaceProps) {
 	const { t } = useTranslation("journal");
+	const { theme, setTheme } = useTheme();
+	const { language, setLanguage, supportedLanguages } = useLanguage();
+	const { enabled: spellcheckEnabled, toggle: toggleSpellcheck } = useSpellcheck();
+	const update = useUpdate();
 	const [showCreateDialog, setShowCreateDialog] = useState(false);
 	const [creating, setCreating] = useState(false);
 	const [showShortcuts, setShowShortcuts] = useState(false);
 	const [showSettings, setShowSettings] = useState(false);
+	const [settingsTab, setSettingsTab] = useState("appearance");
 	const [name, setName] = useState("");
 	const [description, setDescription] = useState("");
 	const [privacy, setPrivacy] = useState<JournalPrivacy>("public");
@@ -267,6 +280,13 @@ export function JournalWorkspace({
 								<MenubarShortcut>Ctrl+S</MenubarShortcut>
 							</MenubarItem>
 							<MenubarItem
+								onClick={() => void editorCommands?.save(true)}
+								disabled={!editorCommands?.canSave}
+							>
+								{t("menu.saveKeepEditing", "Guardar sin salir de edición")}
+								<MenubarShortcut>Ctrl+Shift+S</MenubarShortcut>
+							</MenubarItem>
+							<MenubarItem
 								onClick={() => void editorCommands?.deleteEntry()}
 								disabled={!editorCommands?.canDelete}
 								variant="destructive"
@@ -322,6 +342,41 @@ export function JournalWorkspace({
 								{t("menu.underline", "Subrayado")}
 								<MenubarShortcut>Ctrl+U</MenubarShortcut>
 							</MenubarItem>
+							<MenubarItem
+								onClick={() => editorCommands?.toggleStrike()}
+								disabled={!editorCommands}
+							>
+								{t("context.strike", "Tachado")}
+							</MenubarItem>
+							<MenubarSeparator />
+							<MenubarItem
+								onClick={() => editorCommands?.cut()}
+								disabled={!editorCommands}
+							>
+								{t("context.cut", "Cortar")}
+								<MenubarShortcut>Ctrl+X</MenubarShortcut>
+							</MenubarItem>
+							<MenubarItem
+								onClick={() => editorCommands?.copy()}
+								disabled={!editorCommands}
+							>
+								{t("context.copy", "Copiar")}
+								<MenubarShortcut>Ctrl+C</MenubarShortcut>
+							</MenubarItem>
+							<MenubarItem
+								onClick={() => editorCommands?.paste()}
+								disabled={!editorCommands}
+							>
+								{t("context.paste", "Pegar")}
+								<MenubarShortcut>Ctrl+V</MenubarShortcut>
+							</MenubarItem>
+							<MenubarItem
+								onClick={() => editorCommands?.selectAll()}
+								disabled={!editorCommands}
+							>
+								{t("context.selectAll", "Seleccionar todo")}
+								<MenubarShortcut>Ctrl+A</MenubarShortcut>
+							</MenubarItem>
 						</MenubarContent>
 					</MenubarMenu>
 
@@ -334,16 +389,79 @@ export function JournalWorkspace({
 							<MenubarItem onClick={() => void onOpenJournal(activeJournal.id)}>
 								{t("menu.reopenJournal", "Recargar diario activo")}
 							</MenubarItem>
+							<MenubarSeparator />
+							<MenubarItem
+								onClick={() => void onLockJournal(activeJournal.id)}
+								disabled={activeJournal.privacy !== "private"}
+							>
+								{t("menu.lockJournal", "Bloquear diario")}
+							</MenubarItem>
 						</MenubarContent>
 					</MenubarMenu>
 
 					<MenubarMenu>
 						<MenubarTrigger>{t("menu.view", "Ver")}</MenubarTrigger>
 						<MenubarContent>
-							<MenubarItem onClick={() => setShowSettings(true)}>
+							<MenubarItem
+								onClick={() => {
+									setSettingsTab("appearance");
+									setShowSettings(true);
+								}}
+							>
 								{t("menu.settings", "Configuración")}
 								<MenubarShortcut>Ctrl+,</MenubarShortcut>
 							</MenubarItem>
+							<MenubarItem onClick={toggleSidebar}>
+								{t("menu.toggleSidebar", "Mostrar / ocultar barra lateral")}
+								<MenubarShortcut>Ctrl+.</MenubarShortcut>
+							</MenubarItem>
+							<MenubarSeparator />
+							<MenubarCheckboxItem
+								checked={spellcheckEnabled}
+								onCheckedChange={() => toggleSpellcheck()}
+							>
+								{t("context.spellcheck", "Corrector ortográfico")}
+							</MenubarCheckboxItem>
+							<MenubarSeparator />
+							<MenubarSub>
+								<MenubarSubTrigger>{t("menu.theme", "Tema")}</MenubarSubTrigger>
+								<MenubarSubContent>
+									<MenubarRadioGroup
+										value={theme}
+										onValueChange={(value) =>
+											setTheme(value as "light" | "dark" | "system")
+										}
+									>
+										<MenubarRadioItem value="light">
+											{t("menu.themeLight", "Claro")}
+										</MenubarRadioItem>
+										<MenubarRadioItem value="dark">
+											{t("menu.themeDark", "Oscuro")}
+										</MenubarRadioItem>
+										<MenubarRadioItem value="system">
+											{t("menu.themeSystem", "Sistema")}
+										</MenubarRadioItem>
+									</MenubarRadioGroup>
+								</MenubarSubContent>
+							</MenubarSub>
+							<MenubarSub>
+								<MenubarSubTrigger>{t("menu.language", "Idioma")}</MenubarSubTrigger>
+								<MenubarSubContent className="max-h-80 overflow-y-auto">
+									{supportedLanguages.map((lang) => (
+										<MenubarItem
+											key={lang.code}
+											onClick={() => void setLanguage(lang.code)}
+											className="gap-2.5"
+										>
+											<Flag code={lang.region} className="text-base" />
+											<span className="flex-1">{lang.label}</span>
+											{lang.code === language && (
+												<Check className="size-4 text-primary" />
+											)}
+										</MenubarItem>
+									))}
+								</MenubarSubContent>
+							</MenubarSub>
 						</MenubarContent>
 					</MenubarMenu>
 
@@ -352,6 +470,21 @@ export function JournalWorkspace({
 						<MenubarContent>
 							<MenubarItem onClick={() => setShowShortcuts(true)}>
 								{t("menu.shortcuts", "Atajos de teclado")}
+							</MenubarItem>
+							<MenubarItem
+								onClick={() => void update.checkNow()}
+								disabled={update.checking || update.downloading}
+							>
+								{t("settings.checkForUpdates", "Buscar actualizaciones")}
+							</MenubarItem>
+							<MenubarSeparator />
+							<MenubarItem
+								onClick={() => {
+									setSettingsTab("about");
+									setShowSettings(true);
+								}}
+							>
+								{t("menu.about", "Acerca de")}
 							</MenubarItem>
 						</MenubarContent>
 					</MenubarMenu>
@@ -571,7 +704,11 @@ export function JournalWorkspace({
 				</DialogContent>
 			</Dialog>
 
-			<SettingsDialog open={showSettings} onOpenChange={setShowSettings} />
+			<SettingsDialog
+				open={showSettings}
+				onOpenChange={setShowSettings}
+				defaultTab={settingsTab}
+			/>
 		</>
 	);
 }
