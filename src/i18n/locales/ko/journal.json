@@ -123,7 +123,9 @@
 		"paste": "붙여넣기",
 		"selectAll": "모두 선택",
 		"emoji": "이모지 삽입…",
-		"spellcheck": "맞춤법 검사"
+		"spellcheck": "맞춤법 검사",
+		"addToDictionary": "사전에 추가",
+		"noSuggestions": "제안 없음"
 	},
 	"menu": {
 		"file": "파일",

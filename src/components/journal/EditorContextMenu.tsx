@@ -1,4 +1,4 @@
-import { type ReactNode, useMemo, useState } from "react";
+import { type ReactNode, useMemo, useRef, useState } from "react";
 import { type Editor } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
 import { platform } from "@tauri-apps/plugin-os";
@@ -15,6 +15,7 @@ import {
 	TextSelect,
 	Smile,
 	SpellCheck,
+	BookPlus,
 } from "lucide-react";
 import {
 	ContextMenu,
@@ -27,6 +28,7 @@ import {
 } from "@/components/ui/context-menu";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useSpellcheck } from "@/components/spellcheck-provider";
+import { useSpell } from "@/components/spell-provider";
 import { useTheme } from "@/components/theme-provider";
 import { openEmojiPicker } from "@/services/systemApi";
 import { cn } from "@/lib/utils";
@@ -64,11 +66,73 @@ function StyleButton({ active, label, onToggle, children }: StyleButtonProps) {
 	);
 }
 
+const WORD_CHAR = /[\p{L}\p{M}'’-]/u;
+
+/** Rango y texto de la palabra bajo unas coordenadas de pantalla, o null. */
+function wordRangeAtCoords(editor: Editor, clientX: number, clientY: number) {
+	const view = editor.view;
+	const coords = view.posAtCoords({ left: clientX, top: clientY });
+	if (!coords) return null;
+	const $pos = view.state.doc.resolve(coords.pos);
+	if (!$pos.parent.isTextblock) return null;
+	const text = $pos.parent.textContent;
+	const offset = $pos.parentOffset;
+	let start = offset;
+	let end = offset;
+	while (start > 0 && WORD_CHAR.test(text[start - 1])) start--;
+	while (end < text.length && WORD_CHAR.test(text[end])) end++;
+	if (start >= end) return null;
+	const base = $pos.start();
+	return { from: base + start, to: base + end, word: text.slice(start, end) };
+}
+
+interface Misspelled {
+	word: string;
+	from: number;
+	to: number;
+	suggestions: string[];
+}
+
 export function EditorContextMenu({ editor, children }: EditorContextMenuProps) {
 	const { t } = useTranslation("journal");
 	const { enabled: spellcheckEnabled, toggle: toggleSpellcheck } = useSpellcheck();
+	const { check, suggest, addWord } = useSpell();
 	const { resolvedTheme } = useTheme();
 	const [emojiOpen, setEmojiOpen] = useState(false);
+	const coordsRef = useRef<{ x: number; y: number } | null>(null);
+	const [misspelled, setMisspelled] = useState<Misspelled | null>(null);
+
+	const handleOpenChange = (open: boolean) => {
+		if (!open) {
+			setMisspelled(null);
+			return;
+		}
+		const coords = coordsRef.current;
+		if (!coords) {
+			setMisspelled(null);
+			return;
+		}
+		const range = wordRangeAtCoords(editor, coords.x, coords.y);
+		if (!range || range.word.length < 2 || check(range.word)) {
+			setMisspelled(null);
+			return;
+		}
+		setMisspelled({ ...range, suggestions: suggest(range.word) });
+	};
+
+	const replaceMisspelled = (replacement: string) => {
+		if (!misspelled) return;
+		editor
+			.chain()
+			.focus()
+			.insertContentAt({ from: misspelled.from, to: misspelled.to }, replacement)
+			.run();
+	};
+
+	const addMisspelledToDictionary = () => {
+		if (!misspelled) return;
+		void addWord(misspelled.word);
+	};
 
 	// El selector nativo del SO es fiable en Windows/macOS. En Linux el atajo
 	// (Ctrl+.) choca con el toggle del sidebar y no es fiable, así que usamos el
@@ -136,13 +200,46 @@ export function EditorContextMenu({ editor, children }: EditorContextMenuProps) 
 
 	return (
 		<>
-			<ContextMenu>
+			<ContextMenu onOpenChange={handleOpenChange}>
 				<ContextMenuTrigger asChild>
-					<div data-context-zone className="flex flex-1 flex-col">
+					<div
+						data-context-zone
+						className="flex flex-1 flex-col"
+						onContextMenu={(e) => {
+							coordsRef.current = { x: e.clientX, y: e.clientY };
+						}}
+					>
 						{children}
 					</div>
 				</ContextMenuTrigger>
 				<ContextMenuContent className="w-56">
+					{/* Ortografía: sugerencias + añadir al diccionario (si la palabra
+					    bajo el cursor está mal escrita) */}
+					{misspelled && (
+						<>
+							{misspelled.suggestions.length > 0 ? (
+								misspelled.suggestions.map((s) => (
+									<ContextMenuItem
+										key={s}
+										onSelect={() => replaceMisspelled(s)}
+										className="font-medium"
+									>
+										{s}
+									</ContextMenuItem>
+								))
+							) : (
+								<ContextMenuItem disabled>
+									{t("context.noSuggestions", "Sin sugerencias")}
+								</ContextMenuItem>
+							)}
+							<ContextMenuItem onSelect={() => addMisspelledToDictionary()}>
+								<BookPlus />
+								{t("context.addToDictionary", "Añadir al diccionario")}
+							</ContextMenuItem>
+							<ContextMenuSeparator />
+						</>
+					)}
+
 					{/* Sección superior: estilos de letra básicos (botones cuadrados) */}
 					<div className="flex items-center gap-1 p-1">
 						<StyleButton

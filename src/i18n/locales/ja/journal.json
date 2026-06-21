@@ -123,7 +123,9 @@
 		"paste": "貼り付け",
 		"selectAll": "すべて選択",
 		"emoji": "絵文字を挿入…",
-		"spellcheck": "スペルチェック"
+		"spellcheck": "スペルチェック",
+		"addToDictionary": "辞書に追加",
+		"noSuggestions": "候補なし"
 	},
 	"menu": {
 		"file": "ファイル",

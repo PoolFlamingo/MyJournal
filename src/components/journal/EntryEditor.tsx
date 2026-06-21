@@ -2,6 +2,8 @@
 import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/components/language-provider";
 import { useSpellcheck } from "@/components/spellcheck-provider";
+import { useSpell } from "@/components/spell-provider";
+import { Spellcheck } from "@/lib/tiptap/spellcheck";
 import { setSpellcheck, spellcheckLocales } from "@/services/systemApi";
 import { EditorContextMenu } from "./EditorContextMenu";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -80,6 +82,7 @@ export function EntryEditor({
 	const { t } = useTranslation("journal");
 	const { language } = useLanguage();
 	const { enabled: spellcheckEnabled } = useSpellcheck();
+	const { ready: spellReady, revision: spellRevision, check: spellCheck } = useSpell();
 	const [title, setTitle] = useState("");
 	const [saving, setSaving] = useState(false);
 	const [dirty, setDirty] = useState(false);
@@ -111,6 +114,7 @@ export function EntryEditor({
 			TableRow,
 			TableHeader,
 			TableCell,
+			Spellcheck,
 		],
 		content: "",
 		onUpdate: () => {
@@ -156,10 +160,19 @@ export function EntryEditor({
 	useEffect(() => {
 		if (!editor) return;
 		const dom = editor.view.dom as HTMLElement;
-		dom.setAttribute("spellcheck", String(spellcheckEnabled));
+		// El cuerpo usa nuestro motor propio (extensión `mjSpellcheck`); apagamos
+		// el corrector nativo aquí para no duplicar subrayados. El título (textarea)
+		// sí usa el nativo del webview.
+		dom.setAttribute("spellcheck", "false");
 		dom.setAttribute("lang", language);
 		void setSpellcheck(spellcheckEnabled, spellcheckLocales(language));
 	}, [editor, spellcheckEnabled, language, isEditMode]);
+
+	// Alimenta el corrector propio del cuerpo (subrayado de palabras mal escritas).
+	useEffect(() => {
+		if (!editor) return;
+		editor.commands.setSpellChecker(spellcheckEnabled && spellReady ? spellCheck : null);
+	}, [editor, spellcheckEnabled, spellReady, spellRevision, spellCheck]);
 
 	const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setTitle(e.target.value);

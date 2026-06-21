@@ -226,6 +226,17 @@
 	line-height: 1;
 }
 
+/* ── Subrayado ortográfico propio (motor nspell) ──────────────
+   Decoración que aplica la extensión Tiptap `mjSpellcheck` a las palabras
+   mal escritas en el cuerpo del editor. */
+.mj-spell-error {
+	text-decoration-line: underline;
+	text-decoration-style: wavy;
+	text-decoration-color: var(--destructive);
+	text-decoration-skip-ink: none;
+	text-underline-offset: 0.18em;
+}
+
 /* ── TipTap editor content styles ─────────────────────────── */
 .tiptap {
 	outline: none;

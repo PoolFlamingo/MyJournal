@@ -9,7 +9,7 @@ use commands::journals::{
     app_bootstrap, app_get_setting, app_set_setting, journal_create, journal_delete, journal_list,
     journal_lock, journal_open, journal_rename, journal_unlock,
 };
-use commands::system::{open_emoji_picker, set_spellcheck};
+use commands::system::{open_emoji_picker, set_spellcheck, spell_add_to_system};
 use state::UnlockedJournals;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -48,6 +48,7 @@ pub fn run() {
             font_delete,
             open_emoji_picker,
             set_spellcheck,
+            spell_add_to_system,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

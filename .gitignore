@@ -15,6 +15,9 @@ dist
 dist-ssr
 *.local
 
+# Diccionarios copiados por scripts/copy-dictionaries.mjs (se regeneran desde npm)
+public/dictionaries
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

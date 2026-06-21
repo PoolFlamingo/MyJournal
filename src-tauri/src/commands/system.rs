@@ -82,3 +82,49 @@ pub fn set_spellcheck(
 ) -> Result<(), String> {
 	Ok(())
 }
+
+/// Añade una palabra al diccionario personal del SO. En Linux escribe en la
+/// lista personal de enchant (`$XDG_CONFIG_HOME/enchant/<locale>.dic`, una
+/// palabra por línea), que es la que usa WebKitGTK y otras apps GTK. En
+/// Windows/macOS es un no-op (el diccionario lo gestiona el motor propio).
+#[cfg(target_os = "linux")]
+#[tauri::command]
+pub fn spell_add_to_system(language: String, word: String) -> Result<(), String> {
+	use std::io::Write;
+
+	let word = word.trim();
+	if word.is_empty() {
+		return Ok(());
+	}
+
+	let base = std::env::var_os("XDG_CONFIG_HOME")
+		.map(std::path::PathBuf::from)
+		.filter(|p| !p.as_os_str().is_empty())
+		.or_else(|| std::env::var_os("HOME").map(|h| std::path::PathBuf::from(h).join(".config")))
+		.ok_or_else(|| "no se pudo determinar el directorio de configuración".to_string())?;
+
+	let dir = base.join("enchant");
+	std::fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+	let file = dir.join(format!("{language}.dic"));
+
+	// Evita duplicados.
+	if let Ok(existing) = std::fs::read_to_string(&file) {
+		if existing.lines().any(|line| line.trim() == word) {
+			return Ok(());
+		}
+	}
+
+	let mut f = std::fs::OpenOptions::new()
+		.create(true)
+		.append(true)
+		.open(&file)
+		.map_err(|e| e.to_string())?;
+	writeln!(f, "{word}").map_err(|e| e.to_string())?;
+	Ok(())
+}
+
+#[cfg(not(target_os = "linux"))]
+#[tauri::command]
+pub fn spell_add_to_system(_language: String, _word: String) -> Result<(), String> {
+	Ok(())
+}

@@ -7,6 +7,7 @@ import "@/i18n/i18n";
 import "@/lib/disable-native-context-menu";
 import { LanguageProvider } from "@/components/language-provider";
 import { SpellcheckProvider } from "@/components/spellcheck-provider";
+import { SpellProvider } from "@/components/spell-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { ThemePresetProvider } from "@/components/theme-preset-provider";
 import { EditorFontProvider } from "@/components/editor-font-provider";
@@ -22,19 +23,21 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 		<MotionConfig reducedMotion="user">
 			<LanguageProvider>
 				<SpellcheckProvider>
-					<ThemeProvider defaultTheme="system" storageKey="tauract-ui-theme">
-						<ThemePresetProvider>
-							<EditorFontProvider>
-								<UpdateProvider>
-									<TooltipProvider>
-										<App />
-										<GlobalTooltips />
-										<Toaster />
-									</TooltipProvider>
-								</UpdateProvider>
-							</EditorFontProvider>
-						</ThemePresetProvider>
-					</ThemeProvider>
+					<SpellProvider>
+						<ThemeProvider defaultTheme="system" storageKey="tauract-ui-theme">
+							<ThemePresetProvider>
+								<EditorFontProvider>
+									<UpdateProvider>
+										<TooltipProvider>
+											<App />
+											<GlobalTooltips />
+											<Toaster />
+										</TooltipProvider>
+									</UpdateProvider>
+								</EditorFontProvider>
+							</ThemePresetProvider>
+						</ThemeProvider>
+					</SpellProvider>
 				</SpellcheckProvider>
 			</LanguageProvider>
 		</MotionConfig>

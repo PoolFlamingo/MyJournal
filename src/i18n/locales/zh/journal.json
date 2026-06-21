@@ -123,7 +123,9 @@
 		"paste": "粘贴",
 		"selectAll": "全选",
 		"emoji": "插入表情……",
-		"spellcheck": "拼写检查"
+		"spellcheck": "拼写检查",
+		"addToDictionary": "添加到词典",
+		"noSuggestions": "无建议"
 	},
 	"menu": {
 		"file": "文件",

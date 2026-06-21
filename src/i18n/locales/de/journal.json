@@ -123,7 +123,9 @@
 		"paste": "Einfügen",
 		"selectAll": "Alles auswählen",
 		"emoji": "Emoji einfügen…",
-		"spellcheck": "Rechtschreibprüfung"
+		"spellcheck": "Rechtschreibprüfung",
+		"addToDictionary": "Zum Wörterbuch hinzufügen",
+		"noSuggestions": "Keine Vorschläge"
 	},
 	"menu": {
 		"file": "Datei",

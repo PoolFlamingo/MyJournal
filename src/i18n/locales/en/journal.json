@@ -123,7 +123,9 @@
 		"paste": "Paste",
 		"selectAll": "Select all",
 		"emoji": "Insert emoji…",
-		"spellcheck": "Spell check"
+		"spellcheck": "Spell check",
+		"addToDictionary": "Add to dictionary",
+		"noSuggestions": "No suggestions"
 	},
 	"menu": {
 		"file": "File",

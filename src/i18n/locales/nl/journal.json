@@ -123,7 +123,9 @@
 		"paste": "Plakken",
 		"selectAll": "Alles selecteren",
 		"emoji": "Emoji invoegen…",
-		"spellcheck": "Spellingcontrole"
+		"spellcheck": "Spellingcontrole",
+		"addToDictionary": "Toevoegen aan woordenboek",
+		"noSuggestions": "Geen suggesties"
 	},
 	"menu": {
 		"file": "Bestand",
