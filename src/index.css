@@ -216,6 +216,31 @@
 	font-family: var(--editor-font, var(--font-serif)), "Noto Color Emoji";
 }
 
+/* ── Selección de texto estilo app de escritorio ──────────────
+   Nada es seleccionable salvo los campos de formulario y el interior del
+   editor (título + cuerpo). También se evita arrastrar imágenes fuera del
+   editor. */
+body {
+	-webkit-user-select: none;
+	user-select: none;
+}
+input,
+textarea,
+select,
+[contenteditable="true"],
+.tiptap,
+.ProseMirror,
+.mj-editor-surface {
+	-webkit-user-select: text;
+	user-select: text;
+}
+img {
+	-webkit-user-drag: none;
+}
+.tiptap img {
+	-webkit-user-drag: auto;
+}
+
 /* ── Emoji a color (banderas del selector de idioma, etc.) ────
    "Noto Color Emoji" se empaqueta localmente vía @fontsource (sin URLs).
    Necesario sobre todo en Windows, donde el sistema no dibuja banderas. */
