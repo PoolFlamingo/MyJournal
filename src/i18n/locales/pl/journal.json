@@ -15,7 +15,8 @@
 		"newJournal": "Nowy dziennik",
 		"settings": "Ustawienia",
 		"workspace": "Obszar roboczy",
-		"toggle": "Pokaż / ukryj pasek boczny"
+		"toggle": "Pokaż / ukryj pasek boczny",
+		"tagline": "Twój bezpieczny osobisty dziennik"
 	},
 	"journal": {
 		"name": "Nazwa dziennika",
@@ -125,7 +126,8 @@
 		"emoji": "Wstaw emoji…",
 		"spellcheck": "Sprawdzanie pisowni",
 		"addToDictionary": "Dodaj do słownika",
-		"noSuggestions": "Brak podpowiedzi"
+		"noSuggestions": "Brak podpowiedzi",
+		"search": "Szukaj..."
 	},
 	"menu": {
 		"file": "Plik",

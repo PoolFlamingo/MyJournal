@@ -2,8 +2,7 @@ import { type ReactNode, useMemo, useRef, useState } from "react";
 import { type Editor } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
 import { platform } from "@tauri-apps/plugin-os";
-import EmojiPicker from "@emoji-mart/react";
-import emojiData from "@emoji-mart/data";
+import { EmojiPicker } from "./EmojiPicker";
 import {
 	Bold,
 	Italic,
@@ -29,7 +28,6 @@ import {
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useSpellcheck } from "@/components/spellcheck-provider";
 import { useSpell } from "@/components/spell-provider";
-import { useTheme } from "@/components/theme-provider";
 import { openEmojiPicker } from "@/services/systemApi";
 import { cn } from "@/lib/utils";
 
@@ -97,7 +95,6 @@ export function EditorContextMenu({ editor, children }: EditorContextMenuProps) 
 	const { t } = useTranslation("journal");
 	const { enabled: spellcheckEnabled, toggle: toggleSpellcheck } = useSpellcheck();
 	const { check, suggest, addWord } = useSpell();
-	const { resolvedTheme } = useTheme();
 	const [emojiOpen, setEmojiOpen] = useState(false);
 	const coordsRef = useRef<{ x: number; y: number } | null>(null);
 	const [misspelled, setMisspelled] = useState<Misspelled | null>(null);
@@ -191,10 +188,8 @@ export function EditorContextMenu({ editor, children }: EditorContextMenuProps) 
 		}
 	};
 
-	const onPickEmoji = (emoji: { native?: string }) => {
-		if (emoji?.native) {
-			editor.chain().focus().insertContent(emoji.native).run();
-		}
+	const onPickEmoji = (native: string) => {
+		editor.chain().focus().insertContent(native).run();
 		setEmojiOpen(false);
 	};
 
@@ -320,13 +315,7 @@ export function EditorContextMenu({ editor, children }: EditorContextMenuProps) 
 					<DialogTitle className="sr-only">
 						{t("context.emoji", "Insertar emoji…")}
 					</DialogTitle>
-					<EmojiPicker
-						data={emojiData}
-						onEmojiSelect={onPickEmoji}
-						theme={resolvedTheme === "dark" ? "dark" : "light"}
-						previewPosition="none"
-						autoFocus
-					/>
+					<EmojiPicker onSelect={onPickEmoji} />
 				</DialogContent>
 			</Dialog>
 		</>

@@ -15,7 +15,8 @@
 		"newJournal": "새 일기",
 		"settings": "설정",
 		"workspace": "작업 공간",
-		"toggle": "사이드바 표시 / 숨기기"
+		"toggle": "사이드바 표시 / 숨기기",
+		"tagline": "당신의 안전한 개인 일기"
 	},
 	"journal": {
 		"name": "일기 이름",
@@ -125,7 +126,8 @@
 		"emoji": "이모지 삽입…",
 		"spellcheck": "맞춤법 검사",
 		"addToDictionary": "사전에 추가",
-		"noSuggestions": "제안 없음"
+		"noSuggestions": "제안 없음",
+		"search": "검색..."
 	},
 	"menu": {
 		"file": "파일",

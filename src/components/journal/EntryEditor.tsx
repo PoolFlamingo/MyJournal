@@ -174,10 +174,13 @@ export function EntryEditor({
 	}, [editor, spellcheckEnabled, language, isEditMode]);
 
 	// Alimenta el corrector propio del cuerpo (subrayado de palabras mal escritas).
+	// Solo en modo edición: en solo-lectura no se subraya nada.
 	useEffect(() => {
 		if (!editor) return;
-		editor.commands.setSpellChecker(spellcheckEnabled && spellReady ? spellCheck : null);
-	}, [editor, spellcheckEnabled, spellReady, spellRevision, spellCheck]);
+		editor.commands.setSpellChecker(
+			isEditMode && spellcheckEnabled && spellReady ? spellCheck : null
+		);
+	}, [editor, isEditMode, spellcheckEnabled, spellReady, spellRevision, spellCheck]);
 
 	const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
 		setTitle(e.target.value);

@@ -15,7 +15,8 @@
 		"newJournal": "新しい日記",
 		"settings": "設定",
 		"workspace": "ワークスペース",
-		"toggle": "サイドバーの表示／非表示"
+		"toggle": "サイドバーの表示／非表示",
+		"tagline": "あなたの安全な個人日記"
 	},
 	"journal": {
 		"name": "日記名",
@@ -125,7 +126,8 @@
 		"emoji": "絵文字を挿入…",
 		"spellcheck": "スペルチェック",
 		"addToDictionary": "辞書に追加",
-		"noSuggestions": "候補なし"
+		"noSuggestions": "候補なし",
+		"search": "検索..."
 	},
 	"menu": {
 		"file": "ファイル",

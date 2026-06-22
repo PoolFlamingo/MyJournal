@@ -15,7 +15,8 @@
 		"newJournal": "Nuovo diario",
 		"settings": "Impostazioni",
 		"workspace": "Area di lavoro",
-		"toggle": "Mostra / nascondi barra laterale"
+		"toggle": "Mostra / nascondi barra laterale",
+		"tagline": "Il tuo diario personale sicuro"
 	},
 	"journal": {
 		"name": "Nome del diario",
@@ -125,7 +126,8 @@
 		"emoji": "Inserisci emoji…",
 		"spellcheck": "Controllo ortografico",
 		"addToDictionary": "Aggiungi al dizionario",
-		"noSuggestions": "Nessun suggerimento"
+		"noSuggestions": "Nessun suggerimento",
+		"search": "Cerca..."
 	},
 	"menu": {
 		"file": "File",

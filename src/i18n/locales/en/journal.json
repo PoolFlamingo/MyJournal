@@ -15,7 +15,8 @@
 		"newJournal": "New journal",
 		"settings": "Settings",
 		"workspace": "Workspace",
-		"toggle": "Show / hide sidebar"
+		"toggle": "Show / hide sidebar",
+		"tagline": "Your secure personal journal"
 	},
 	"journal": {
 		"name": "Journal name",
@@ -125,7 +126,8 @@
 		"emoji": "Insert emoji…",
 		"spellcheck": "Spell check",
 		"addToDictionary": "Add to dictionary",
-		"noSuggestions": "No suggestions"
+		"noSuggestions": "No suggestions",
+		"search": "Search..."
 	},
 	"menu": {
 		"file": "File",

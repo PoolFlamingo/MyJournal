@@ -15,7 +15,8 @@
 		"newJournal": "Nouveau journal",
 		"settings": "Paramètres",
 		"workspace": "Espace de travail",
-		"toggle": "Afficher / masquer la barre latérale"
+		"toggle": "Afficher / masquer la barre latérale",
+		"tagline": "Votre journal personnel sécurisé"
 	},
 	"journal": {
 		"name": "Nom du journal",
@@ -125,7 +126,8 @@
 		"emoji": "Insérer un emoji…",
 		"spellcheck": "Vérification orthographique",
 		"addToDictionary": "Ajouter au dictionnaire",
-		"noSuggestions": "Aucune suggestion"
+		"noSuggestions": "Aucune suggestion",
+		"search": "Rechercher..."
 	},
 	"menu": {
 		"file": "Fichier",

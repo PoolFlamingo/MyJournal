@@ -15,7 +15,8 @@
 		"newJournal": "新建日记本",
 		"settings": "设置",
 		"workspace": "工作区",
-		"toggle": "显示 / 隐藏侧边栏"
+		"toggle": "显示 / 隐藏侧边栏",
+		"tagline": "你的私密个人日记"
 	},
 	"journal": {
 		"name": "日记本名称",
@@ -125,7 +126,8 @@
 		"emoji": "插入表情……",
 		"spellcheck": "拼写检查",
 		"addToDictionary": "添加到词典",
-		"noSuggestions": "无建议"
+		"noSuggestions": "无建议",
+		"search": "搜索..."
 	},
 	"menu": {
 		"file": "文件",

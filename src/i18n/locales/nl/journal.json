@@ -15,7 +15,8 @@
 		"newJournal": "Nieuw dagboek",
 		"settings": "Instellingen",
 		"workspace": "Werkruimte",
-		"toggle": "Zijbalk tonen / verbergen"
+		"toggle": "Zijbalk tonen / verbergen",
+		"tagline": "Je veilige persoonlijke dagboek"
 	},
 	"journal": {
 		"name": "Dagboeknaam",
@@ -125,7 +126,8 @@
 		"emoji": "Emoji invoegen…",
 		"spellcheck": "Spellingcontrole",
 		"addToDictionary": "Toevoegen aan woordenboek",
-		"noSuggestions": "Geen suggesties"
+		"noSuggestions": "Geen suggesties",
+		"search": "Zoeken..."
 	},
 	"menu": {
 		"file": "Bestand",

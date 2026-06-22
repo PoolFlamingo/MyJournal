@@ -15,7 +15,8 @@
 		"newJournal": "Jurnal nou",
 		"settings": "Setări",
 		"workspace": "Spațiu de lucru",
-		"toggle": "Afișează / ascunde bara laterală"
+		"toggle": "Afișează / ascunde bara laterală",
+		"tagline": "Jurnalul tău personal securizat"
 	},
 	"journal": {
 		"name": "Numele jurnalului",
@@ -125,7 +126,8 @@
 		"emoji": "Inserează emoji…",
 		"spellcheck": "Verificare ortografică",
 		"addToDictionary": "Adaugă în dicționar",
-		"noSuggestions": "Nicio sugestie"
+		"noSuggestions": "Nicio sugestie",
+		"search": "Caută..."
 	},
 	"menu": {
 		"file": "Fișier",

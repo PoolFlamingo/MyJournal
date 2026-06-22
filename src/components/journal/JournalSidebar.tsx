@@ -147,7 +147,7 @@ export function JournalSidebar({
 						My Journal
 					</span>
 					<span className="truncate text-[10px] text-muted-foreground uppercase tracking-widest">
-						{t("sidebar.workspace")}
+						{t("sidebar.tagline", "Tu diario personal seguro")}
 					</span>
 				</div>
 			</div>

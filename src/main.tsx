@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { MotionConfig } from "motion/react";
-import "@fontsource/noto-color-emoji";
 import "flag-icons/css/flag-icons.min.css";
 import "@/i18n/i18n";
 import "@/lib/disable-native-context-menu";

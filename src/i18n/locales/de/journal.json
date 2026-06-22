@@ -15,7 +15,8 @@
 		"newJournal": "Neues Tagebuch",
 		"settings": "Einstellungen",
 		"workspace": "Arbeitsbereich",
-		"toggle": "Seitenleiste ein- / ausblenden"
+		"toggle": "Seitenleiste ein- / ausblenden",
+		"tagline": "Dein sicheres persönliches Tagebuch"
 	},
 	"journal": {
 		"name": "Tagebuchname",
@@ -125,7 +126,8 @@
 		"emoji": "Emoji einfügen…",
 		"spellcheck": "Rechtschreibprüfung",
 		"addToDictionary": "Zum Wörterbuch hinzufügen",
-		"noSuggestions": "Keine Vorschläge"
+		"noSuggestions": "Keine Vorschläge",
+		"search": "Suchen..."
 	},
 	"menu": {
 		"file": "Datei",
