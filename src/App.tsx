@@ -56,6 +56,7 @@ function App() {
 				selectedDate={journal.selectedDate}
 				currentEntry={journal.currentEntry}
 				entryLoading={journal.entryLoading}
+				firstLoad={journal.firstLoad}
 				onSelectDate={journal.selectDate}
 				onMonthChange={journal.loadMonth}
 				onOpenJournal={journal.openJournal}

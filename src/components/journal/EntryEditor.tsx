@@ -49,6 +49,7 @@ interface EntryEditorProps {
 	selectedDate: string;
 	entry: EntryDocument | null;
 	loading: boolean;
+	firstLoad: boolean;
 	titleRequired: boolean;
 	onSave: (data: SaveEntryDto) => Promise<void>;
 	onDelete: (date: string) => Promise<void>;
@@ -79,6 +80,7 @@ export function EntryEditor({
 	selectedDate,
 	entry,
 	loading,
+	firstLoad,
 	titleRequired,
 	onSave,
 	onDelete,
@@ -305,7 +307,7 @@ export function EntryEditor({
 		}
 	);
 
-	if (loading) {
+	if (loading && firstLoad) {
 		return (
 			<div className="flex absolute inset-0 items-center justify-center bg-background/50 backdrop-blur-sm z-10">
 				<div className="flex flex-col items-center gap-4 text-primary">

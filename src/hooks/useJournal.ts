@@ -15,6 +15,7 @@ export interface UseJournalReturn {
 	// App state
 	view: AppView;
 	loading: boolean;
+	firstLoad: boolean;
 	error: string | null;
 	// Journals
 	journals: JournalSummary[];
@@ -46,6 +47,7 @@ export function useJournal(): UseJournalReturn {
 	const mountedRef = useRef(true);
 	const [view, setView] = useState<AppView>("loading");
 	const [loading, setLoading] = useState(true);
+	const [firstLoad, setFirstLoad] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [journals, setJournals] = useState<JournalSummary[]>([]);
 	const [activeJournal, setActiveJournal] = useState<JournalDetails | null>(null);
@@ -67,7 +69,7 @@ export function useJournal(): UseJournalReturn {
 				if (!mountedRef.current) return;
 
 				setJournals(result.journals);
-
+				setFirstLoad(false);
 				if (result.journals.length === 0) {
 					setView("welcome");
 					setLoading(false);
@@ -362,6 +364,7 @@ export function useJournal(): UseJournalReturn {
 	return {
 		view,
 		loading,
+		firstLoad,
 		error,
 		journals,
 		activeJournal,

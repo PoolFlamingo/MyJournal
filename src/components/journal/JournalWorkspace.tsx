@@ -94,6 +94,7 @@ interface JournalWorkspaceProps {
 	selectedDate: string;
 	currentEntry: EntryDocument | null;
 	entryLoading: boolean;
+	firstLoad: boolean;
 	onSelectDate: (date: string) => Promise<void>;
 	onMonthChange: (year: number, month: number) => Promise<void>;
 	onOpenJournal: (id: string) => Promise<void>;
@@ -111,6 +112,7 @@ export function JournalWorkspace({
 	selectedDate,
 	currentEntry,
 	entryLoading,
+	firstLoad,
 	onSelectDate,
 	onMonthChange,
 	onOpenJournal,
@@ -505,6 +507,7 @@ export function JournalWorkspace({
 					selectedDate={selectedDate}
 					entry={currentEntry}
 					loading={entryLoading}
+					firstLoad={firstLoad}
 					titleRequired={activeJournal.titleRequired}
 					onSave={onSaveEntry}
 					onDelete={onDeleteEntry}
