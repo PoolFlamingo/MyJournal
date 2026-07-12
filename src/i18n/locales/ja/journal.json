@@ -287,7 +287,8 @@
 		"deleteError": "フォントを削除できませんでした",
 		"delete": "フォントを削除",
 		"tooltip": "テキストフォント",
-		"useDefault": "エディターのデフォルト"
+		"useDefault": "エディターのデフォルト",
+		"useThemeDefault": "テーマのデフォルト"
 	},
 	"fontSize": {
 		"label": "文字サイズ",

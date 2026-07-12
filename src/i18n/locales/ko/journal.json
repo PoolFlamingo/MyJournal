@@ -287,7 +287,8 @@
 		"deleteError": "글꼴을 제거할 수 없습니다",
 		"delete": "글꼴 제거",
 		"tooltip": "텍스트 글꼴",
-		"useDefault": "편집기 기본값"
+		"useDefault": "편집기 기본값",
+		"useThemeDefault": "테마 기본값"
 	},
 	"fontSize": {
 		"label": "텍스트 크기",

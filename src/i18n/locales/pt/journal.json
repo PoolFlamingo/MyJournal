@@ -287,7 +287,8 @@
 		"deleteError": "Não foi possível remover o tipo de letra",
 		"delete": "Remover tipo de letra",
 		"tooltip": "Tipo de letra do texto",
-		"useDefault": "Predefinição do editor"
+		"useDefault": "Predefinição do editor",
+		"useThemeDefault": "Predefinição do tema"
 	},
 	"fontSize": {
 		"label": "Tamanho do texto",

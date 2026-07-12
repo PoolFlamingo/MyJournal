@@ -287,7 +287,8 @@
 		"deleteError": "Impossibile rimuovere il carattere",
 		"delete": "Rimuovi carattere",
 		"tooltip": "Carattere del testo",
-		"useDefault": "Predefinito dell'editor"
+		"useDefault": "Predefinito dell'editor",
+		"useThemeDefault": "Predefinito del tema"
 	},
 	"fontSize": {
 		"label": "Dimensione del testo",

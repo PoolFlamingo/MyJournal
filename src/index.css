@@ -213,7 +213,7 @@
    EditorFontProvider; it falls back to the active theme's serif. */
 .tiptap,
 .mj-editor-surface {
-	font-family: var(--editor-font, var(--font-serif)), "Noto Color Emoji";
+	font-family: var(--editor-font), "Noto Color Emoji";
 }
 
 /* ── Selección de texto estilo app de escritorio ──────────────

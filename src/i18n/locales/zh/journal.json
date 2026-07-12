@@ -287,7 +287,8 @@
 		"deleteError": "无法移除该字体",
 		"delete": "移除字体",
 		"tooltip": "文本字体",
-		"useDefault": "编辑器默认"
+		"useDefault": "编辑器默认",
+		"useThemeDefault": "主题默认"
 	},
 	"fontSize": {
 		"label": "文字大小",

@@ -287,7 +287,8 @@
 		"deleteError": "Impossible de supprimer la police",
 		"delete": "Supprimer la police",
 		"tooltip": "Police du texte",
-		"useDefault": "Police par défaut de l'éditeur"
+		"useDefault": "Police par défaut de l'éditeur",
+		"useThemeDefault": "Police par défaut du thème"
 	},
 	"fontSize": {
 		"label": "Taille du texte",

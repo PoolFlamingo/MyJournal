@@ -287,7 +287,8 @@
 		"deleteError": "No se pudo eliminar la fuente",
 		"delete": "Eliminar fuente",
 		"tooltip": "Fuente del texto",
-		"useDefault": "Predeterminada del editor"
+		"useDefault": "Predeterminada del editor",
+		"useThemeDefault": "Predeterminada del tema"
 	},
 	"fontSize": {
 		"label": "Tamaño del texto",

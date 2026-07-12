@@ -287,7 +287,8 @@
 		"deleteError": "Schriftart konnte nicht entfernt werden",
 		"delete": "Schriftart entfernen",
 		"tooltip": "Textschriftart",
-		"useDefault": "Editor-Standard"
+		"useDefault": "Editor-Standard",
+		"useThemeDefault": "Design-Standard"
 	},
 	"fontSize": {
 		"label": "Textgröße",

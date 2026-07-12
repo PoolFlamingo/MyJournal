@@ -287,7 +287,8 @@
 		"deleteError": "Fontul nu a putut fi eliminat",
 		"delete": "Elimină fontul",
 		"tooltip": "Fontul textului",
-		"useDefault": "Implicit al editorului"
+		"useDefault": "Implicit al editorului",
+		"useThemeDefault": "Implicit al temei"
 	},
 	"fontSize": {
 		"label": "Dimensiunea textului",

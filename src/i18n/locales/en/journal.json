@@ -287,7 +287,8 @@
 		"deleteError": "Could not remove the font",
 		"delete": "Remove font",
 		"tooltip": "Text font",
-		"useDefault": "Editor default"
+		"useDefault": "Editor default",
+		"useThemeDefault": "Theme default"
 	},
 	"fontSize": {
 		"label": "Text size",

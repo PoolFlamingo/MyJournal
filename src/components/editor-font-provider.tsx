@@ -10,7 +10,6 @@ import {
 import "@/lib/fonts/fontsource-imports";
 import {
 	BUILTIN_FONTS,
-	DEFAULT_EDITOR_FONT_ID,
 	builtinFontById,
 	customFontOption,
 	customIdFromOptionId,
@@ -22,9 +21,9 @@ const EDITOR_FONT_STORAGE_KEY = "my-journal-editor-font";
 const EDITOR_FONT_CSS_VAR = "--editor-font";
 
 interface EditorFontState {
-	/** Currently selected font option id (persisted). */
-	fontId: string;
-	setFontId: (id: string) => void;
+	/** Currently selected font option id (persisted), or null for the theme default. */
+	fontId: string | null;
+	setFontId: (id: string | null) => void;
 	/** Bundled fonts (sans/serif/mono). */
 	builtinFonts: FontOption[];
 	/** User-uploaded fonts. */
@@ -53,11 +52,11 @@ async function loadFontFace(family: string, bytes: Uint8Array): Promise<void> {
 }
 
 export function EditorFontProvider({ children }: { children: React.ReactNode }) {
-	const [fontId, setFontIdState] = useState<string>(() => {
+	const [fontId, setFontIdState] = useState<string | null>(() => {
 		const saved = localStorage.getItem(EDITOR_FONT_STORAGE_KEY);
-		// Ignore stale ids (e.g. the removed "theme-default" sentinel).
-		if (saved && (saved.startsWith("fs:") || saved.startsWith("custom:"))) return saved;
-		return DEFAULT_EDITOR_FONT_ID;
+		if (!saved || saved === "theme-default" || saved === "null") return null;
+		if (saved.startsWith("fs:") || saved.startsWith("custom:")) return saved;
+		return null;
 	});
 	const [customFonts, setCustomFonts] = useState<FontOption[]>([]);
 	const loadedRef = useRef(false);
@@ -65,10 +64,23 @@ export function EditorFontProvider({ children }: { children: React.ReactNode }) 
 	const builtinFonts = BUILTIN_FONTS;
 	const allFonts = useMemo(() => [...BUILTIN_FONTS, ...customFonts], [customFonts]);
 
+	// On first mount, ensure CSS variable is properly initialized to theme default
+	useEffect(() => {
+		// Clear any stale CSS variable on mount
+		document.documentElement.style.removeProperty(EDITOR_FONT_CSS_VAR);
+	}, []);
+
 	const getStack = useCallback(
-		(id: string): string => {
-			const found = [...BUILTIN_FONTS, ...customFonts].find((f) => f.id === id);
-			return (found ?? builtinFontById(id)).stack;
+		(id: string | null): string => {
+			if (!id) return "";
+			// Built-in fonts: look up via official function
+			if (id.startsWith("fs:")) {
+				const found = BUILTIN_FONTS.find((f) => f.id === id);
+				return found?.stack || builtinFontById(id).stack;
+			}
+			// Custom fonts: search in current list
+			const custom = customFonts.find((f) => f.id === id);
+			return custom?.stack || "";
 		},
 		[customFonts]
 	);
@@ -102,14 +114,37 @@ export function EditorFontProvider({ children }: { children: React.ReactNode }) 
 		};
 	}, []);
 
-	// Apply the selected font as a CSS variable consumed by editor-scoped styles.
+	// Apply font as CSS variable when fontId changes.
 	useEffect(() => {
-		document.documentElement.style.setProperty(EDITOR_FONT_CSS_VAR, getStack(fontId));
-	}, [fontId, getStack]);
+		if (!fontId) {
+			// Clear the CSS var to use theme default via CSS fallback
+			document.documentElement.style.removeProperty(EDITOR_FONT_CSS_VAR);
+			return;
+		}
 
-	const setFontId = useCallback((id: string) => {
+		// Look up the font stack for the selected font ID
+		let stack = "";
+		if (fontId.startsWith("fs:")) {
+			const found = BUILTIN_FONTS.find((f) => f.id === fontId);
+			stack = found?.stack || builtinFontById(fontId).stack;
+		} else if (fontId.startsWith("custom:")) {
+			const custom = customFonts.find((f) => f.id === fontId);
+			stack = custom?.stack || "";
+		}
+
+		// Apply the stack to the CSS variable
+		if (stack) {
+			document.documentElement.style.setProperty(EDITOR_FONT_CSS_VAR, stack);
+		}
+	}, [fontId, customFonts]);
+
+	const setFontId = useCallback((id: string | null) => {
 		setFontIdState(id);
-		localStorage.setItem(EDITOR_FONT_STORAGE_KEY, id);
+		if (id) {
+			localStorage.setItem(EDITOR_FONT_STORAGE_KEY, id);
+		} else {
+			localStorage.removeItem(EDITOR_FONT_STORAGE_KEY);
+		}
 	}, []);
 
 	const uploadFont = useCallback(async (file: File): Promise<FontOption> => {
@@ -132,23 +167,26 @@ export function EditorFontProvider({ children }: { children: React.ReactNode }) 
 		setCustomFonts((prev) => prev.filter((f) => f.id !== optionId));
 		setFontIdState((current) => {
 			if (current === optionId) {
-				localStorage.setItem(EDITOR_FONT_STORAGE_KEY, DEFAULT_EDITOR_FONT_ID);
-				return DEFAULT_EDITOR_FONT_ID;
+				localStorage.removeItem(EDITOR_FONT_STORAGE_KEY);
+				return null;
 			}
 			return current;
 		});
 	}, []);
 
-	const value: EditorFontState = {
-		fontId,
-		setFontId,
-		builtinFonts,
-		customFonts,
-		allFonts,
-		getStack,
-		uploadFont,
-		removeCustomFont,
-	};
+	const value: EditorFontState = useMemo(
+		() => ({
+			fontId,
+			setFontId,
+			builtinFonts,
+			customFonts,
+			allFonts,
+			getStack,
+			uploadFont,
+			removeCustomFont,
+		}),
+		[fontId, setFontId, builtinFonts, customFonts, allFonts, getStack, uploadFont, removeCustomFont]
+	);
 
 	return (
 		<EditorFontContext.Provider value={value}>{children}</EditorFontContext.Provider>

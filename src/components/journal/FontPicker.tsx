@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { type Editor } from "@tiptap/react";
 import { toast } from "sonner";
@@ -43,16 +43,35 @@ export function FontPicker({ compact = false, className, editor }: FontPickerPro
 	const sansFonts = builtinFonts.filter((f) => f.category === "sans");
 	const serifFonts = builtinFonts.filter((f) => f.category === "serif");
 	const monoFonts = builtinFonts.filter((f) => f.category === "mono");
-	const allFonts = [...builtinFonts, ...customFonts];
+	const allFonts = useMemo(
+		() => [...builtinFonts, ...customFonts],
+		[builtinFonts, customFonts]
+	);
 
 	// In inline mode the "current" font is the one applied at the cursor/selection.
 	const activeStack = editor?.getAttributes("textStyle").fontFamily as string | undefined;
-	const current = inlineMode
-		? allFonts.find((f) => f.stack === activeStack)
-		: allFonts.find((f) => f.id === fontId);
+	const isThemeDefault = !inlineMode && fontId === null;
+	
+	// For global mode, look up the font by ID from builtinFonts first, then customFonts
+	const getCurrentFont = () => {
+		if (inlineMode) {
+			return allFonts.find((f) => f.stack === activeStack);
+		}
+		if (!fontId) return undefined;
+		// Try builtin fonts first (they're stable)
+		const builtin = builtinFonts.find((f) => f.id === fontId);
+		if (builtin) return builtin;
+		// Then try custom fonts
+		return customFonts.find((f) => f.id === fontId);
+	};
+	
+	const current = useMemo(getCurrentFont, [inlineMode, activeStack, fontId, builtinFonts, customFonts, allFonts]);
+	
 	const currentLabel = inlineMode
 		? (current?.label ?? t("editorFont.useDefault", "Predeterminada"))
-		: (current?.label ?? builtinFonts[0]?.label);
+		: isThemeDefault
+			? t("editorFont.useThemeDefault", "Predeterminada del tema")
+			: (current?.label ?? builtinFonts[0]?.label);
 
 	const isSelected = (option: FontOption) =>
 		inlineMode ? option.stack === activeStack : option.id === fontId;
@@ -67,7 +86,11 @@ export function FontPicker({ compact = false, className, editor }: FontPickerPro
 	};
 
 	const clearFont = () => {
-		editor?.chain().focus().unsetFontFamily().run();
+		if (editor) {
+			editor.chain().focus().unsetFontFamily().run();
+		} else {
+			setFontId(null);
+		}
 		setOpen(false);
 	};
 
@@ -177,10 +200,10 @@ export function FontPicker({ compact = false, className, editor }: FontPickerPro
 					<CommandInput placeholder={t("editorFont.search", "Buscar fuente...")} />
 					<CommandList>
 						<CommandEmpty>{t("editorFont.empty", "Sin resultados")}</CommandEmpty>
-						{inlineMode && (
+						{inlineMode ? (
 							<CommandGroup>
 								<CommandItem
-									value={t("editorFont.useDefault", "Predeterminada")}
+									value={"default"}
 									onSelect={clearFont}
 									className="gap-2"
 								>
@@ -192,6 +215,24 @@ export function FontPicker({ compact = false, className, editor }: FontPickerPro
 									/>
 									<span className="text-muted-foreground">
 										{t("editorFont.useDefault", "Predeterminada del editor")}
+									</span>
+								</CommandItem>
+							</CommandGroup>
+						):(
+							<CommandGroup>
+								<CommandItem
+									value={"theme-default"}
+									onSelect={clearFont}
+									className="gap-2"
+								>
+									<Check
+										className={cn(
+											"size-4 shrink-0",
+											fontId === null ? "text-primary opacity-100" : "opacity-0"
+										)}
+									/>
+									<span className="text-muted-foreground">
+										{t("editorFont.useThemeDefault", "Predeterminada del tema")}
 									</span>
 								</CommandItem>
 							</CommandGroup>

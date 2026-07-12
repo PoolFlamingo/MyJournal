@@ -287,7 +287,8 @@
 		"deleteError": "Nie udało się usunąć czcionki",
 		"delete": "Usuń czcionkę",
 		"tooltip": "Czcionka tekstu",
-		"useDefault": "Domyślna edytora"
+		"useDefault": "Domyślna edytora",
+		"useThemeDefault": "Domyślna motywu"
 	},
 	"fontSize": {
 		"label": "Rozmiar tekstu",

@@ -287,7 +287,8 @@
 		"deleteError": "Lettertype kon niet worden verwijderd",
 		"delete": "Lettertype verwijderen",
 		"tooltip": "Tekstlettertype",
-		"useDefault": "Editor-standaard"
+		"useDefault": "Editor-standaard",
+		"useThemeDefault": "Thema-standaard"
 	},
 	"fontSize": {
 		"label": "Tekstgrootte",
